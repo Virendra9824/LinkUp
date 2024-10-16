@@ -32,11 +32,11 @@ export default function UserDetails() {
             </div>
           </div> */}
           <div className="flex items-center justify-between">
-            <div className="flex gap-x-2 items-center border-red-500 border">
+            <div className="flex gap-x-2 items-center  ">
               <img
                 src={profilePic} // Replace with actual image URL
                 alt="profile"
-                className="aspect-square xs:w-12 w-10 rounded-full border-2 border-white"
+                className="aspect-square xs:w-12 w-10 rounded-full "
               />
               <div className="flex flex-col justify-center items-start">
                 {" "}
