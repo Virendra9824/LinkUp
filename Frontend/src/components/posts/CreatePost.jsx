@@ -16,23 +16,23 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="bg-[#1A1A1A] h-fit px-6 py-4 rounded-lg">
+    <div className="bg-[#1A1A1A] h-fit px-4 xs:px-6 py-4 rounded-lg">
       {/* Upper Section */}
       <div className="flex gap-x-4 items-center">
         {/* Profile Image */}
         <img
           src={profilePic}
           alt="profile"
-          className="rounded-full w-9 h-9 md:w-12  md:h-12 object-cover"
+          className="rounded-full w-9  md:w-12  object-cover aspect-square"
         />
         {/* Input Text */}
         <input
           type="text"
           placeholder="What's on your mind..."
-          className="flex-grow bg-[#333333] text-white focus:outline-none px-8 text-sm py-2 md:py-4 rounded-full"
+          className="flex-grow bg-[#333333] text-white focus:outline-none px-4 xs:px-8 text-sm py-2 md:py-4 rounded-full"
         />
         {/* Emoji Button */}
-        <div className="border border-[#00D5FA] rounded-sm py-2 px-3 text-white cursor-pointer">
+        <div className=" hidden xs:block border border-[#00D5FA] rounded-sm py-2 px-3 text-white cursor-pointer">
           <BsEmojiSunglasses color="#00D5FA" />
         </div>
       </div>

@@ -27,15 +27,15 @@ export default function ShowPost() {
   };
 
   return (
-    <div className="bg-[#1A1A1A] h-fit px-6 py-4 flex flex-col gap-y-4 rounded-lg">
+    <div className="bg-[#1A1A1A] h-fit  px-4 xs:px-6  py-4 flex flex-col gap-y-4 rounded-lg">
       {/* User-Info */}
-      <div className="flex justify-between items-center gap-x-32">
+      <div className="flex justify-between items-center ">
         <div className="flex gap-x-2 justify-center items-center">
           {/* img */}
           <img
             src={profilePic}
             alt="profile"
-            className="rounded-full w-12 h-12 object-cover"
+            className="rounded-full  w-10   md:w-12   object-cover aspect-square"
           />
           {/* Name and Country */}
           <div className="flex flex-col text-gray-200">
@@ -64,7 +64,7 @@ export default function ShowPost() {
         <img
           src={profilePic}
           alt="profile"
-          className="w-full h-96 rounded-md"
+          className="w-full h-72 xs:h-96 rounded-md"
         />
       </div>
 
@@ -103,7 +103,7 @@ export default function ShowPost() {
 
       {/* Comment-Section-Open/Close */}
       {showComments && (
-        <div className="border-t border-gray-700 mt-2 pt-2">
+        <div className="border-t border-gray-700 mt-0 xs:mt-2 pt-2">
           {/* Display existing comments */}
           <div className="flex flex-col gap-y-1">
             <CommentCard
@@ -120,15 +120,15 @@ export default function ShowPost() {
 
           {/* Add comment input */}
           <div className="flex items-center gap-x-2 mt-4">
-            <button className="w-10 h-10 px-2 py-1 bg-blue-500 rounded-lg flex items-center justify-center text-lg">
+            <button className="w-10 h-10 px-2 py-1 bg-blue-500 rounded-lg  items-center justify-center text-lg  hidden xs:flex ">
               😊
             </button>
             <input
               type="text"
               placeholder="Add your comment here"
-              className="w-full bg-[#1A1A1A] border border-gray-600 p-2 rounded-lg text-white focus:outline-none"
+              className="w-full bg-[#1A1A1A] border border-gray-600  py-[6px] xs:py-2  px-2 rounded-lg text-white focus:outline-none text-sm xs:text-base"
             />
-            <button className="px-4 py-2 bg-[#00D5FA] rounded-lg text-black font-semibold">
+            <button className="px-4 py-1 xs:py-2 bg-[#00D5FA] rounded-lg text-black font-semibold">
               POST
             </button>
           </div>
