@@ -6,7 +6,7 @@ import UserSuggested from "../components/home/UserSuggested"
 
 export default function Home() {
   return (
-    
+
     <div className="w-[90%] py-5 border-4 border-emerald-600 mx-auto flex  md:flex-row flex-col justify-between gap-8 min-h-screen">
       <div className="md:w-[30%] w-full">
         <UserDetails  />
@@ -15,7 +15,7 @@ export default function Home() {
         <CreatePost />
         <ShowPost />
       </div>
-      <div className="d:w-[30%] w-full">
+      <div className="md:w-[30%] w-full">
         <UserSuggested/>
       </div>
     </div>
