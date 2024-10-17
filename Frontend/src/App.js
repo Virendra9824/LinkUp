@@ -5,6 +5,9 @@ import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
+import UpdateProfile from "./pages/UpdateProfile";
+import SignUpForm from "./pages/SignUpForm";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -13,6 +16,11 @@ export default function App() {
       <Routes>
         <Route path={"/"} element={<Home />} />
         <Route path={"/chat"} element={<Chat />} />
+        <Route path={"/update-profile"} element={<UpdateProfile />} />
+        <Route path={"/update-password"} element={<UpdateProfile />} />
+        <Route path={"/delete-account"} element={<UpdateProfile />} />
+        <Route path={"/signup"} element={<SignUpForm />} />
+        <Route path={"/login"} element={<Login />} />
       </Routes>
       <Footer />
     </div>
