@@ -11,10 +11,10 @@ export default function Notification() {
   };
 
   return (
-    <div className="md:pt-4 md:pb-8 pt-12 flex flex-col md:flex-row w-[90%] m-auto">
+    <div className="md:pt-4 md:pb-8  pt-12 flex flex-col md:flex-row w-[90%] m-auto">
       {/* Notification Section */}
       <div
-        className={`w-full md:w-[35%] bg-[rgb(26,26,26)] md:rounded-l-[8px] border-[1px] h-[400px] overflow-y-auto ${
+        className={`w-full  overflow-y-scroll scrollbar-hide md:w-[35%] bg-[rgb(26,26,26)] md:rounded-l-[8px] border-[1px] h-[400px] overflow-y-auto ${
           selectedNotification ? "hidden" : "block"
         } md:block`}
       >
