@@ -5,9 +5,12 @@ import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
-import UpdateProfile from "./pages/UpdateProfile";
+import UpdateProfile from "./components/forms/UpdateProfile";
 import SignUpForm from "./pages/SignUpForm";
 import Login from "./pages/Login";
+import DeleteAccount from "./components/forms/DeleteAccount";
+import UpdatePassword from "./components/forms/UpdatePassword";
+import Notification from "./pages/Notification";
 
 export default function App() {
   return (
@@ -16,9 +19,10 @@ export default function App() {
       <Routes>
         <Route path={"/"} element={<Home />} />
         <Route path={"/chat"} element={<Chat />} />
+        <Route path={"/notification"} element={<Notification />} />
         <Route path={"/update-profile"} element={<UpdateProfile />} />
-        <Route path={"/update-password"} element={<UpdateProfile />} />
-        <Route path={"/delete-account"} element={<UpdateProfile />} />
+        <Route path={"/update-password"} element={<UpdatePassword />} />
+        <Route path={"/delete-account"} element={<DeleteAccount />} />
         <Route path={"/signup"} element={<SignUpForm />} />
         <Route path={"/login"} element={<Login />} />
       </Routes>
@@ -26,3 +30,4 @@ export default function App() {
     </div>
   );
 }
+
