@@ -10,7 +10,7 @@ import SignUpForm from "./pages/SignUpForm";
 import Login from "./pages/Login";
 import DeleteAccount from "./components/forms/DeleteAccount";
 import UpdatePassword from "./components/forms/UpdatePassword";
-// import Notification from "./pages/Notification";
+import Notification from "./pages/Notification";
 
 export default function App() {
   return (
@@ -20,7 +20,7 @@ export default function App() {
         <Routes>
           <Route path={"/"} element={<Home />} />
           <Route path={"/chat"} element={<Chat />} />
-          {/* <Route path={"/notification"} element={<Notification />} /> */}
+          <Route path={"/notification"} element={<Notification />} />
           <Route path={"/update-profile"} element={<UpdateProfile />} />
           <Route path={"/update-password"} element={<UpdatePassword />} />
           <Route path={"/delete-account"} element={<DeleteAccount />} />
