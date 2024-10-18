@@ -152,7 +152,7 @@ export default function Header() {
           <Link to="testPage" className="text-xl cursor-pointer">
             <MdMessage />
           </Link>
-          <Link to="testPage" className="text-xl cursor-pointer">
+          <Link to="notification" className="text-xl cursor-pointer">
             <IoIosNotifications />
           </Link>
           <Link to="testPage" className="text-xl cursor-pointer">
