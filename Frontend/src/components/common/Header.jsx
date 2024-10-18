@@ -7,6 +7,7 @@ import { PiQuestionMarkFill } from "react-icons/pi";
 import { MdMessage } from "react-icons/md";
 import { FaBars, FaTimes } from "react-icons/fa"; // Import icons for mobile menu button
 import { HiSearch } from "react-icons/hi";
+import Chat from "../../pages/Chat";
 
 export default function Header() {
   let userName = "Vijay Kumar";
@@ -29,7 +30,7 @@ export default function Header() {
   return (
     
     <div className="bg-[rgb(26,26,26)]">
-      <header className="w-[90%] text-white m-auto py-5 flex justify-between items-center relative">
+      <header className="w-[90%] text-white m-auto py-5 flex justify-between items-center relative z-[1000]">
       {/* Logo Section */}
       <div className="flex items-center space-x-4">
         <Link to="/" className="text-2xl md:text-3xl font-bold text-cyan-500 whitespace-nowrap">
@@ -82,7 +83,7 @@ export default function Header() {
             <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
               <IoMdMoon />
             </Link>
-            <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
+            <Link to={"/chat"} className="text-xl text-white hover:text-cyan-500">
               <MdMessage />
             </Link>
             <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
@@ -156,7 +157,7 @@ export default function Header() {
         <Link to="testPage" className="text-xl cursor-pointer">
           <IoMdMoon />
         </Link>
-        <Link to="testPage" className="text-xl cursor-pointer">
+        <Link to="/chat" className="text-xl cursor-pointer">
           <MdMessage />
         </Link>
         <Link to="testPage" className="text-xl cursor-pointer">
