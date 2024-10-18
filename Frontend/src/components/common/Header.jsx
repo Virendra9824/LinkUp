@@ -89,7 +89,7 @@ export default function Header() {
               <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
                 <MdMessage />
               </Link>
-              <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
+              <Link to="notification" className="text-xl text-white hover:text-cyan-500">
                 <IoIosNotifications />
               </Link>
               <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
