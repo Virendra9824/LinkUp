@@ -37,8 +37,8 @@ const UpdatePassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex md:pt-24 pt-20  items-center justify-center bg-[rgb(10,10,10)]   p-4"  >
-      <div className="bg-[rgb(26,26,26)] md:text-md text-sm p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div className=" flex    items-center my-20 justify-center bg-[rgb(10,10,10)] "  >
+      <div className="bg-[rgb(26,26,26)]  md:text-md text-sm p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className=" md:text-xl text-md  font-semibold text-white mb-5 text-center">
           Welcome to Link-Up, update your password!
         </h1>
