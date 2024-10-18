@@ -8,108 +8,68 @@ export default function SingleNotification() {
       user: "Jonathan Michael Djbnkjnkjnoe the Third", // Example of a long name
       action: "liked your post",
       time: "2 hours ago",
-      avatar: "https://via.placeholder.com/150",
+      avatar: "https://i.pinimg.com/564x/88/f7/0a/88f70a56a6b69c9464f8600ab4bebe3f.jpg",
     },
     {
       id: 2,
       user: "Jane Smith",
       action: "commented on your photo",
       time: "5 hours ago",
-      avatar: "https://via.placeholder.com/150",
+      avatar: "https://i.pinimg.com/564x/7d/ac/b3/7dacb3b58c25ceeebc4f970c6c3f8ee3.jpg",
     },
     {
       id: 3,
       user: "Mike Ross",
       action: "started followinlinlsefaljng you", //example of long action
       time: "1 day ago",
-      avatar: "https://via.placeholder.com/150",
+      avatar: "https://www.shutterstock.com/shutterstock/photos/2494502645/display_1500/stock-photo-florence-tuscany-italy-december-th-city-tour-in-florence-michelangelo-s-david-of-2494502645.jpg",
     },{
-        id: 1,
+        id: 4,
         user: "Jonathan Michael Djbnkjnkjnoe the Third", // Example of a long name
         action: "liked your post",
         time: "2 hours ago",
         avatar: "https://via.placeholder.com/150",
       },
       {
-        id: 2,
+        id: 5,
         user: "Jane Smith",
         action: "commented on your photo",
         time: "5 hours ago",
         avatar: "https://via.placeholder.com/150",
       },
       {
-        id: 3,
+        id: 6,
         user: "Mike Ross",
         action: "started followinlinlsefaljng you", //example of long action
         time: "1 day ago",
         avatar: "https://via.placeholder.com/150",
       },{
-        id: 1,
+        id: 7,
         user: "Jonathan Michael Djbnkjnkjnoe the Third", // Example of a long name
         action: "liked your post",
         time: "2 hours ago",
         avatar: "https://via.placeholder.com/150",
       },
       {
-        id: 2,
+        id: 8,
         user: "Jane Smith",
         action: "commented on your photo",
         time: "5 hours ago",
         avatar: "https://via.placeholder.com/150",
       },
       {
-        id: 3,
+        id: 9,
         user: "Mike Ross",
         action: "started followinlinlsefaljng you", //example of long action
         time: "1 day ago",
         avatar: "https://via.placeholder.com/150",
-      },{
-        id: 1,
-        user: "Jonathan Michael Djbnkjnkjnoe the Third", // Example of a long name
-        action: "liked your post",
-        time: "2 hours ago",
-        avatar: "https://via.placeholder.com/150",
-      },
-      {
-        id: 2,
-        user: "Jane Smith",
-        action: "commented on your photo",
-        time: "5 hours ago",
-        avatar: "https://via.placeholder.com/150",
-      },
-      {
-        id: 3,
-        user: "Mike Ross",
-        action: "started followinlinlsefaljng you", //example of long action
-        time: "1 day ago",
-        avatar: "https://via.placeholder.com/150",
-      },{
-        id: 1,
-        user: "Jonathan Michael Djbnkjnkjnoe the Third", // Example of a long name
-        action: "liked your post",
-        time: "2 hours ago",
-        avatar: "https://via.placeholder.com/150",
-      },
-      {
-        id: 2,
-        user: "Jane Smith",
-        action: "commented on your photo",
-        time: "5 hours ago",
-        avatar: "https://via.placeholder.com/150",
-      },
-      {
-        id: 3,
-        user: "Mike Ross",
-        action: "started followinlinlsefaljng you", //example of long action
-        time: "1 day ago",
-        avatar: "https://via.placeholder.com/150",
-      },
+      }
     // Add more notifications as needed
   ];
 
   return (
     <div className="w-[90%] md:w-[90%] m-auto">
-      <h1 className="text-2xl font-semibold p-1">Notifications</h1>
+      <h1 className="text-2xl font-semibold p-1 my-2">Notifications</h1>
       <div className="space-y-2">
         {notifications.map((notification) => (
           <div
