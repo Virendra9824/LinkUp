@@ -4,6 +4,7 @@ import { CiImageOn } from "react-icons/ci";
 import { MdOutlineGifBox } from "react-icons/md";
 import { MdOutlineAttachFile } from "react-icons/md";
 import { AiTwotoneAudio } from "react-icons/ai";
+import ImageUploader from "../common/ImageUploader";
 
 export default function CreatePost() {
   const [showImageArea, setShowImageArea] = useState(false); // STATE FOR IMAGE AREA
@@ -29,7 +30,7 @@ export default function CreatePost() {
         <input
           type="text"
           placeholder="What's on your mind..."
-          className="flex-grow bg-[#333333] text-white focus:outline-none px-4 xs:px-8 text-sm py-2 md:py-4 rounded-full"
+          className="flex-grow bg-[#333333] text-white focus:outline-none px-4 xs:px-8 text-sm py-2 md:py-4 md:px-3 rounded-full"
         />
         {/* Emoji Button */}
         <div className=" hidden xs:block border border-[#00D5FA] rounded-sm py-2 px-3 text-white cursor-pointer">
@@ -41,8 +42,8 @@ export default function CreatePost() {
       <div className="border rounded-md flex items-center justify-center border-[#343434] my-5">
         {/* Conditional Image Upload Area */}
         {showImageArea && (
-          <div className="m-4 p-4 w-full border-2 border-dashed border-[#00D5FA] text-center text-gray-400">
-            Add Image Here
+          <div className="m-4 w-full rounded-md border-2 border-dashed border-[#00D5FA] text-center  text-gray-400">
+            <ImageUploader />
           </div>
         )}
       </div>
@@ -58,15 +59,15 @@ export default function CreatePost() {
             <CiImageOn />
             <span className="ml-1">Image</span>
           </button>
-          <button className="items-center hidden md:flex">
+          <button className="items-center hidden lg:flex">
             <MdOutlineGifBox />
             <span className="ml-1">Clip</span>
           </button>
-          <button className="flex items-center  hidden md:flex">
+          <button className=" items-center  hidden lg:flex">
             <MdOutlineAttachFile />
             <span className="ml-1">Attachment</span>
           </button>
-          <button className="flex items-center  hidden md:flex">
+          <button className=" items-center  hidden xl:flex">
             <AiTwotoneAudio />
             <span className="ml-1">Audio</span>
           </button>
