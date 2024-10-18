@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdOutlineEdit } from "react-icons/md";
 import { FaTwitter } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa6";
@@ -6,8 +6,15 @@ import { IoLocationOutline } from "react-icons/io5";
 import { IoIosBriefcase } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
+import DeleteAccount from "../forms/DeleteAccount";
 
 export default function UserDetails() {
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  // Function to open the modal
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
   // let { username, commentData, profilePic } = props;
   const profilePic =
     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -101,11 +108,16 @@ export default function UserDetails() {
               Update Password
             </Link>
             <Link
-              to={"/delete-account"}
+              to={"/"}
+              onClick={handleOpenModal}
               className="w-full  text-center inline-block  bg-red-500 text-black hover:text-red-500 hover:bg-[#291818] duration-200 py-1 px-2 rounded-md"
             >
               Delete Account
+
             </Link>
+            <DeleteAccount isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
+
+            
           </div>
         </div>
       </div>
