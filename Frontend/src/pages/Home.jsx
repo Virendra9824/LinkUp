@@ -7,7 +7,7 @@ import UserSuggested from "../components/home/UserSuggested"
 export default function Home() {
   return (
 
-    <div className="w-[90%] py-5 border-4 border-emerald-600 mx-auto flex  md:flex-row flex-col justify-between gap-8 min-h-screen">
+    <div className="w-[90%] md:pb-5 pb-3 md:pt-24 pt-20   border-4 border-emerald-600 mx-auto flex  md:flex-row flex-col justify-between gap-8 min-h-screen">
       <div className="md:w-[30%] w-full">
         <UserDetails  />
       </div>
