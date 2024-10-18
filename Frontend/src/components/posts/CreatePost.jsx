@@ -30,7 +30,7 @@ export default function CreatePost() {
         <input
           type="text"
           placeholder="What's on your mind..."
-          className="flex-grow bg-[#333333] text-white focus:outline-none px-4 xs:px-8 text-sm py-2 md:py-4 rounded-full"
+          className="flex-grow bg-[#333333] text-white focus:outline-none px-4 xs:px-8 text-sm py-2 md:py-4 md:px-3 rounded-full"
         />
         {/* Emoji Button */}
         <div className=" hidden xs:block border border-[#00D5FA] rounded-sm py-2 px-3 text-white cursor-pointer">
@@ -59,15 +59,15 @@ export default function CreatePost() {
             <CiImageOn />
             <span className="ml-1">Image</span>
           </button>
-          <button className="items-center hidden md:flex">
+          <button className="items-center hidden lg:flex">
             <MdOutlineGifBox />
             <span className="ml-1">Clip</span>
           </button>
-          <button className="flex items-center  hidden md:flex">
+          <button className=" items-center  hidden lg:flex">
             <MdOutlineAttachFile />
             <span className="ml-1">Attachment</span>
           </button>
-          <button className="flex items-center  hidden md:flex">
+          <button className=" items-center  hidden xl:flex">
             <AiTwotoneAudio />
             <span className="ml-1">Audio</span>
           </button>
