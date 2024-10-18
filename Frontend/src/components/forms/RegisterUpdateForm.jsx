@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import ImageUploader from "../common/ImageUploader";
 
 export default function RegisterUpdateForm(props) {
   const { isUpdateForm } = props;
@@ -170,8 +171,10 @@ export default function RegisterUpdateForm(props) {
             Profile Photo
           </label>
           <div className="border rounded-md flex items-center justify-center border-gray-500 ">
-            <div className="m-4 p-4 w-full border-2 border-dashed border-[#00D5FA] text-center text-gray-400">
-              Add Image Here
+            <div className="m-4 w-full rounded-md border-2 border-dashed border-[#00D5FA] text-center text-gray-400">
+              <ImageUploader
+                thumbnailLink={props?.isUpdateForm ? props.profilePic : null}
+              />
             </div>
           </div>
         </div>

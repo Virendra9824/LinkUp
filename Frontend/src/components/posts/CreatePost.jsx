@@ -4,6 +4,7 @@ import { CiImageOn } from "react-icons/ci";
 import { MdOutlineGifBox } from "react-icons/md";
 import { MdOutlineAttachFile } from "react-icons/md";
 import { AiTwotoneAudio } from "react-icons/ai";
+import ImageUploader from "../common/ImageUploader";
 
 export default function CreatePost() {
   const [showImageArea, setShowImageArea] = useState(false); // STATE FOR IMAGE AREA
@@ -41,8 +42,8 @@ export default function CreatePost() {
       <div className="border rounded-md flex items-center justify-center border-[#343434] my-5">
         {/* Conditional Image Upload Area */}
         {showImageArea && (
-          <div className="m-4 p-4 w-full border-2 border-dashed border-[#00D5FA] text-center text-gray-400">
-            Add Image Here
+          <div className="m-4 w-full rounded-md border-2 border-dashed border-[#00D5FA] text-center  text-gray-400">
+            <ImageUploader />
           </div>
         )}
       </div>
