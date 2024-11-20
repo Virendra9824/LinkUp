@@ -21,11 +21,11 @@ export default function App() {
           <Route path={"/"} element={<Home />} />
           <Route path={"/chat"} element={<Chat />} />
           <Route path={"/notification"} element={<Notification />} />
-          <Route path={"/update-profile"} element={<UpdateProfile />} />
-          <Route path={"/update-password"} element={<UpdatePassword />} />
-          <Route path={"/delete-account"} element={<DeleteAccount />} />
-          <Route path={"/signup"} element={<SignUpForm />} />
-          <Route path={"/login"} element={<Login />} />
+          <Route path={"/auth/update-profile"} element={<UpdateProfile />} />
+          <Route path={"/auth/update-password"} element={<UpdatePassword />} />
+          <Route path={"/auth/delete-account"} element={<DeleteAccount />} />
+          <Route path={"/auth/signup"} element={<SignUpForm />} />
+          <Route path={"/auth/login"} element={<Login />} />
         </Routes>
       </div>
 
