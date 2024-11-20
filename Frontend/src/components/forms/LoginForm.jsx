@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../../apis/authApi";
 
 export default function LoginForm(props) {
   // State for form inputs
@@ -9,10 +10,12 @@ export default function LoginForm(props) {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   // State for form errors
   const [formErrors, setFormErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Form validation function
   const validateForm = () => {
@@ -31,11 +34,23 @@ export default function LoginForm(props) {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form data submitted:", formData);
-      // Submit form or make API call here
+      setLoading(true); // Set loading state
+      try {
+        // AI-ML: INTEGRATED login FUNCTION FROM authApi.js
+        const response = await login(formData);
+
+        // Redirect to home page
+        navigate("/");
+
+        console.log("Login Successful:", response);
+      } catch (error) {
+        console.error("Login Failed:", error.response?.data || error.message);
+      } finally {
+        setLoading(false); // Reset loading state
+      }
     }
   };
 
