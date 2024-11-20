@@ -4,9 +4,9 @@ const userRoutes = require("./routes/userRoutes.js");
 // const messageRoutes = require("./routes/messageRoutes.js");
 const postRoutes = require("./routes/postRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");
-const cloudinary = require("cloudinary");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const { cloudinaryConnect } = require("./config/cloudinaryConfig.js");
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -23,11 +23,7 @@ app.use(cors(corsOptions));
 
 connectDB();
 
-cloudinary.v2.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+cloudinaryConnect();
 
 app.use(express.json());
 app.use(cookieParser());
