@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-const ImageUploader = ({ thumbnailLink }) => {
-  const [image, setImage] = useState(null);
+const ImageUploader = ({ setPostImage, thumbnailLink }) => {
+  const [postImage, setLocalPostImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
@@ -15,18 +15,20 @@ const ImageUploader = ({ thumbnailLink }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file);
+      setLocalPostImage(file);
       setPreviewUrl(URL.createObjectURL(file));
+      setPostImage(file); // Update the postImage state in CreatePost
     }
   };
 
   const handleCancelImage = () => {
-    setImage(null);
+    setLocalPostImage(null);
     setPreviewUrl(null);
+    setPostImage(null); // Reset the postImage state in CreatePost
   };
 
   return (
-    <div className="relative w-full h-full ">
+    <div className="relative w-full h-full">
       <div className="block w-full">
         {/* If previewUrl is set, display the preview image */}
         {!previewUrl ? (
