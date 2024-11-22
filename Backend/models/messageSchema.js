@@ -1,6 +1,6 @@
-const { default: mongoose } = require("mongoose");
+const { mongoose } = require("mongoose");
 
-const messageSchema = mongoose.Schema(
+const messageSchema = new mongoose.Schema(
   {
     chatId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,18 +13,7 @@ const messageSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-
-    content: {
-      type: String,
-      required: true,
-    },
-
-    readBy: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    text: String,
   },
   { timestamps: true }
 );

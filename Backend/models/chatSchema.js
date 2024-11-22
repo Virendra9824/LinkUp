@@ -2,21 +2,8 @@ const { default: mongoose } = require("mongoose");
 
 const chatSchema = mongoose.Schema(
   {
-    participants: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-    ],
-
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-      },
-    ],
-
+    user:[{type:mongoose.Schema.Types.ObjectId , ref: "User"}],
+   
     latestMessage: {
       content: String,
       sender: {

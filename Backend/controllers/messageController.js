@@ -12,7 +12,7 @@ exports.sendMessage = async (req, res) => {
 		const { receiverId, message } = req.body;
 
 		if (!senderId || !receiverId || !message) {
-			return res.status(404).json({
+			return res.status(400).json({
 				message: "All fields are required!",
 			});
 		}
@@ -41,10 +41,10 @@ exports.sendMessage = async (req, res) => {
 
 		await newMessage.save();
 
-		chat.latestMessage = {
-			content: message,
-			sender: senderId,
-		};
+		await chat.updateOne({
+			latestMessage: 
+			{ content: message, sender: senderId },
+		});
 		await chat.save();
 
 		return res.status(200).json({
