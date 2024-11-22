@@ -1,18 +1,22 @@
 const express = require("express");
-const {
-  registerUser,
-  loginUser,
-  logoutUser,
-  deleteAccount,
-} = require("../controllers/authController.js");
-const uploadFile = require("../middlewares/multer.js");
-const { isAuth } = require("../middlewares/isAuth.js");
-
 const router = express.Router();
+const {  login, requestPasswordResetOtp, resetPassword, sendOTP, signUp, logoutUser, deleteAccount } = require("../controllers/authController.js");
+const uploadFile = require("../middlewares/multer");
+const { isAuth } = require("../middlewares/isAuth");
 
-router.post("/register", uploadFile, registerUser);
-router.post("/login", loginUser);
+// Public Routes
+router.post("/send-otp", sendOTP);
+router.post("/signup",uploadFile , signUp);
+router.post("/login", login);
+
 router.post("/logout", isAuth, logoutUser);
-router.delete("/deleteaccount", isAuth, deleteAccount);
+// router.delete("/delete-account",isAuth, deleteAccount );
+
+
+router.post("/reset-password-otp", requestPasswordResetOtp);
+router.post("/reset-password", resetPassword);
+
+  
+
 
 module.exports = router;
