@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { IoChatbubblesSharp } from "react-icons/io5";
 import UserChat from "../components/chat/UserChat";
+import { getFollowings } from "../apis/userApi";
 export default function Chat() {
   const friends = [
     { name: "Deepika Bajaj", status: "Open chat to see messages" },
@@ -10,8 +11,30 @@ export default function Chat() {
   ];
 
   const [activeChat, setActiveChat] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  let getFollowingsData = async () => {
+    setLoading(true); // Set loading state
+    try {
+      // AI-ML: INTEGRATED login FUNCTION FROM authApi.js
+      const response = await getFollowings();
 
+      // Redirect to home page
+
+      console.log("Followings Data is:", response);
+    } catch (error) {
+      console.error(
+        "Error while getting followings data:",
+        error.response?.data || error.message
+      );
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
+
+  useEffect(() => {
+    getFollowingsData();
+  }, []);
 
   const profilePic =
     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -28,7 +51,7 @@ export default function Chat() {
               placeholder="Search your friends..."
               className="w-[80%] p-2   text-white rounded-xl bg-[#333333] placeholder-gray-400 focus:outline-none"
             />
-            <IoIosSearch className="text-2xl mx-auto"/>
+            <IoIosSearch className="text-2xl mx-auto" />
           </div>
           {/* Friends list */}
           <div className=" w-[95%]  mx-auto">
@@ -55,7 +78,7 @@ export default function Chat() {
           </div>
         </div>
 
-         {/* Main Chat Window */}
+        {/* Main Chat Window */}
 
         <div className="md:flex-1 flex flex-col  ">
           {activeChat ? (
@@ -71,7 +94,6 @@ export default function Chat() {
             </div>
           )}
         </div>
-       
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ const User = require("../models/userSchema.js");
 const getDataUrl = require("../utils/uriGenerator.js");
 const cloudinary = require("cloudinary");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 
 exports.myProfile = async (req, res) => {
 	try {
@@ -20,7 +21,7 @@ exports.myProfile = async (req, res) => {
 // Find user with give ID
 exports.userProfile = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id).select("-password");
+		const user = await User.findById(req.user.id).select("-password");
 
 		if (!user) {
 			return res.status(404).json({
@@ -122,12 +123,17 @@ exports.followersData = async (req, res) => {
 // Get user's Followings
 exports.followingsData = async (req, res) => {
 	try {
-		const followings = await User.findById(req.params.id)
+		let userId = req.user.id;
+		console.log("userId is: ", userId);
+		const followings = await User.findById(userId)
 			.select("followings")
-			.populate("followings", "-password");
+			.populate({
+				path: "followings",
+				select: "firstName lastName email gender profilePic",
+			});
 
 		return res.status(200).json({
-			message: "Followings fetched successfully",
+			message: "Followings data fetched successfully",
 			success: true,
 			data: followings,
 		});
