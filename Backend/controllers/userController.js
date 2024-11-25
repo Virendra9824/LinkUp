@@ -29,7 +29,15 @@ exports.userProfile = async (req, res) => {
 			});
 		}
 
-		return res.status(200).json(user);
+		const followings = await User.findById(req.user.id)
+			.select("followings")
+			.populate({
+				path: "followings",
+				select: "firstName lastName email gender profilePic",
+			})
+			.exec();
+
+		return res.status(200).json({ user, followings });
 	} catch (error) {
 		return res.status(500).json({
 			error: error,
@@ -130,7 +138,8 @@ exports.followingsData = async (req, res) => {
 			.populate({
 				path: "followings",
 				select: "firstName lastName email gender profilePic",
-			});
+			})
+			.exec();
 
 		return res.status(200).json({
 			message: "Followings data fetched successfully",
