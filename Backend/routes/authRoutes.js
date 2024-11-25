@@ -10,7 +10,7 @@ router.post("/signup",uploadFile , signUp);
 router.post("/login", login);
 
 router.post("/logout", isAuth, logoutUser);
-// router.delete("/delete-account",isAuth, deleteAccount );
+router.delete("/delete-account",isAuth, deleteAccount );
 
 
 router.post("/reset-password-otp", requestPasswordResetOtp);
