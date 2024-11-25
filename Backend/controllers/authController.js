@@ -62,9 +62,8 @@ exports.signUp = async (req, res) => {
       gender,
       password,
       confirmPassword,
-      otp
+      otp,
     } = req.body;
-    
 
     if (
       !firstName ||
@@ -90,7 +89,6 @@ exports.signUp = async (req, res) => {
       });
     }
 
-
     // Check if passwords match
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -99,8 +97,6 @@ exports.signUp = async (req, res) => {
           "Password and ConfirmPassword Value do not match, please try again",
       });
     }
-
-    
 
     const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 }); // Fetch only the most recent OTP
 
@@ -130,20 +126,30 @@ exports.signUp = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Profile Pic Handling
     const profilePic = req.file;
+    console.log("Profile Pic:", profilePic);
+
     let profileImageUrl, profileImageId;
 
-
     if (profilePic) {
-      const uploadResponse = await uploadImageToCloudinary(
-        profilePic,
-        "profile_images"
-      );
-      profileImageUrl = uploadResponse.secure_url;
-      profileImageId = uploadResponse.public_id;
+      try {
+        const uploadResponse = await uploadImageToCloudinary(
+          profilePic,
+          "profile_images"
+        );
+        profileImageUrl = uploadResponse.secure_url; // Cloudinary URL
+        profileImageId = uploadResponse.public_id; // Cloudinary public_id
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: "Profile picture upload failed",
+          error: error.message,
+        });
+      }
     } else {
       profileImageUrl = `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`;
-      profileImageId = null;
+      profileImageId = null; // No image uploaded, use a default
     }
 
     // Create user entry in the database
@@ -175,9 +181,6 @@ exports.signUp = async (req, res) => {
     });
   }
 };
-
-
-
 
 // Login function
 exports.login = async (req, res) => {
@@ -215,8 +218,6 @@ exports.login = async (req, res) => {
     const token = generateToken(user._id, res); // Capture the token
     user.password = null; // Remove sensitive data before sending the response
 
-
-
     // Send success response with token
     res.status(200).json({
       success: true,
@@ -237,11 +238,6 @@ exports.login = async (req, res) => {
     });
   }
 };
-
-
-
-
-
 
 // Request New OTP for Password Reset
 exports.requestPasswordResetOtp = async (req, res) => {
@@ -367,112 +363,108 @@ exports.resetPassword = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error Occured in resetPassword",
-      error:error,
+      error: error,
     });
   }
 };
 
-
 exports.logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error,
+      message: "Error in logout: " + error.message,
+      success: false,
+    });
+  }
+};
+
+exports.deleteAccount = async (req, res) => {
 	try {
-		res.clearCookie("token", {
-			httpOnly: true,
-			sameSite: "strict",
-			secure: true,
-		});
+		const userId = req.user.id;
+
+		// Step 1: Delete all posts by the user, including media on Cloudinary
+		const userPosts = await post.find({ owner: userId });
+
+		for (const post of userPosts) {
+			// Delete media from Cloudinary if it exists
+			if (post.media && post.media.id) {
+				await cloudinary.uploader.destroy(post.media.id);
+			}
+			// Delete the post itself from the database
+			await Post.deleteOne({ _id: post._id });
+		}
+
+		// Step 2: Remove likes and comments made by the user on others' posts
+		await Post.updateMany({ likes: userId }, { $pull: { likes: userId } });
+		await Post.updateMany(
+			{ "comments.user": userId },
+			{ $pull: { comments: { user: userId } } }
+		);
+
+		// Step 3: Delete all messages authored by the user
+		await Message.deleteMany({ sender: userId });
+
+		// Step 4: Update all chats to remove the user from participants and delete their messages
+		const chats = await Chat.find({ participants: userId });
+
+		for (const chat of chats) {
+			// Remove user from participants array and delete their messages in each chat
+			await Chat.updateOne(
+				{ _id: chat._id },
+				{
+					$pull: {
+						participants: userId,
+						messages: { sender: userId },
+					},
+				}
+			);
+
+			// Delete chat if it has no participants left
+			const updatedChat = await Chat.findById(chat._id);
+			if (updatedChat.participants.length === 0) {
+				await Chat.deleteOne({ _id: chat._id });
+			}
+		}
+
+		// Step 5: Remove the user from all followers' and followings' lists
+		await User.updateMany(
+			{ followers: userId },
+			{ $pull: { followers: userId } }
+		);
+		await User.updateMany(
+			{ followings: userId },
+			{ $pull: { followings: userId } }
+		);
+
+		// Step 6: Optionally delete profile picture from external storage if needed
+		const user = await User.findById(userId);
+		if (user.profilePic && user.profilePic.id) {
+			await cloudinary.uploader.destroy(user.profilePic.id);
+		}
+
+		// Step 7: Finally, delete the user document itself
+		await User.findByIdAndDelete(userId);
 
 		res.status(200).json({
 			success: true,
-			message: "User logged out successfully!",
-	  });
+			message: "A/C deleted successfully!",
+		});
 	} catch (error) {
 		return res.status(500).json({
 			error: error,
-			message: "Error in logout: " + error.message,
+			message: "Error while Deleting A/C: " + error.message,
 			success: false,
 		});
 	}
 };
-
-
-// exports.deleteAccount = async (req, res) => {
-// 	try {
-// 		const userId = req.user.id;
-
-// 		// Step 1: Delete all posts by the user, including media on Cloudinary
-// 		const userPosts = await post.find({ owner: userId });
-    
-
-
-// 		for (const post of userPosts) {
-// 			// Delete media from Cloudinary if it exists
-// 			if (post.media && post.media.id) {
-// 				await cloudinary.uploader.destroy(post.media.id);
-// 			}
-// 			// Delete the post itself from the database
-// 			await Post.deleteOne({ _id: post._id });
-// 		}
-
-// 		// Step 2: Remove likes and comments made by the user on others' posts
-// 		await Post.updateMany({ likes: userId }, { $pull: { likes: userId } });
-// 		await Post.updateMany(
-// 			{ "comments.user": userId },
-// 			{ $pull: { comments: { user: userId } } }
-// 		);
-
-// 		// Step 3: Delete all messages authored by the user
-// 		await Message.deleteMany({ sender: userId });
-
-// 		// Step 4: Update all chats to remove the user from participants and delete their messages
-// 		const chats = await Chat.find({ participants: userId });
-
-// 		for (const chat of chats) {
-// 			// Remove user from participants array and delete their messages in each chat
-// 			await Chat.updateOne(
-// 				{ _id: chat._id },
-// 				{
-// 					$pull: {
-// 						participants: userId,
-// 						messages: { sender: userId },
-// 					},
-// 				}
-// 			);
-
-// 			// Delete chat if it has no participants left
-// 			const updatedChat = await Chat.findById(chat._id);
-// 			if (updatedChat.participants.length === 0) {
-// 				await Chat.deleteOne({ _id: chat._id });
-// 			}
-// 		}
-
-// 		// Step 5: Remove the user from all followers' and followings' lists
-// 		await User.updateMany(
-// 			{ followers: userId },
-// 			{ $pull: { followers: userId } }
-// 		);
-// 		await User.updateMany(
-// 			{ followings: userId },
-// 			{ $pull: { followings: userId } }
-// 		);
-
-// 		// Step 6: Optionally delete profile picture from external storage if needed
-// 		const user = await User.findById(userId);
-// 		if (user.profilePic && user.profilePic.id) {
-// 			await cloudinary.uploader.destroy(user.profilePic.id);
-// 		}
-
-// 		// Step 7: Finally, delete the user document itself
-// 		await User.findByIdAndDelete(userId);
-
-// 		res.status(200).json({
-// 			success: true,
-// 			message: "A/C deleted successfully!",
-// 		});
-// 	} catch (error) {
-// 		return res.status(500).json({
-// 			error: error,
-// 			message: "Error while Deleting A/C: " + error.message,
-// 			success: false,
-// 		});
-// 	}
-// };
