@@ -1,21 +1,99 @@
 import axios from "axios";
 import { authEndpoints } from "./apisEndpoints.js";
 
-const { LOGIN_API_URL, SIGNUP_API_URL, LOGOUT_API_URL } = authEndpoints;
+const {
+  SEND_OTP_API_URL,
+  SIGNUP_API_URL,
+  LOGIN_API_URL,
+  LOGOUT_API_URL,
+  PASSWORD_RESET_OTP_API_URL,
+  PASSWORD_RESET_API_URL,
+  DELETE_ACCOUNT_API_URL,
+} = authEndpoints;
 
-export const login = async (userData) => {
-  const response = await axios.post(LOGIN_API_URL, userData, {
-    withCredentials: true,
-  });
-  localStorage.setItem("token", JSON.stringify(response.data.token));
-  return response.data;
+// Handle common Axios options
+const axiosConfig = {
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
 };
 
-export const signup = async (userData) => {
-  const response = await axios.post(SIGNUP_API_URL, userData);
-  return response.data;
+
+export const sendOTP = async (userData) => {
+  try {
+    const response = await axios.post(SEND_OTP_API_URL, userData, axiosConfig);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending OTP:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const signUp = async (userData) => {
+  try {
+    const response = await axios.post(SIGNUP_API_URL, userData, axiosConfig);
+    return response.data;
+  } catch (error) {
+    console.error("Error signing up:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const login = async (userData) => {
+  try {
+    const response = await axios.post(LOGIN_API_URL, userData, axiosConfig);
+    return response.data;
+  } catch (error) {
+    console.error("Error logging in:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const logout = async () => {
-  await axios.post(LOGOUT_API_URL);
+  try {
+    const response = await axios.get(LOGOUT_API_URL, axiosConfig);
+    return response.data;
+  } catch (error) {
+    console.error("Error logging out:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const requestPasswordResetOtp = async (userData) => {
+  try {
+    const response = await axios.post(
+      PASSWORD_RESET_OTP_API_URL,
+      userData,
+      axiosConfig
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error requesting password reset OTP:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const resetPassword = async (userData) => {
+  try {
+    const response = await axios.post(
+      PASSWORD_RESET_API_URL,
+      userData,
+      axiosConfig
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteAccount = async () => {
+  try {
+    const response = await axios.delete(DELETE_ACCOUNT_API_URL, axiosConfig);
+    return response.data;
+  } catch (error) {
+    console.error("Error during delete :", error.response?.data || error.message);
+    throw error;
+  }
 };
