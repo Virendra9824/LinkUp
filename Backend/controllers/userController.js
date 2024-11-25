@@ -127,7 +127,10 @@ exports.followingsData = async (req, res) => {
 		console.log("userId is: ", userId);
 		const followings = await User.findById(userId)
 			.select("followings")
-			.populate("followings", "-password");
+			.populate({
+				path: "followings",
+				select: "firstName lastName email gender profilePic",
+			});
 
 		return res.status(200).json({
 			message: "Followings data fetched successfully",
