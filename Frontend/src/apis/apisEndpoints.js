@@ -21,3 +21,8 @@ export const postEndpoints = {
   UPDATE_POST_API_URL: BASE_URL + "/post/update/:id",
   GET_ALL_POSTS_API_URL: BASE_URL + "/post/all",
 };
+
+// USER ENDPOINTS
+export const userEndpoints = {
+  GET_FOLLOWINGS_API_URL: BASE_URL + "/user/followings",
+};
