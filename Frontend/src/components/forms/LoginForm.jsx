@@ -3,6 +3,7 @@ import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../apis/authApi";
+import toast from "react-hot-toast";
 
 export default function LoginForm(props) {
   // State for form inputs
@@ -48,6 +49,7 @@ export default function LoginForm(props) {
         console.log("Login Successful:", response);
       } catch (error) {
         console.error("Login Failed:", error.response?.data || error.message);
+        toast.error(error.response?.data.message);
       } finally {
         setLoading(false); // Reset loading state
       }
@@ -130,6 +132,7 @@ export default function LoginForm(props) {
 
         {/* Submit Button */}
         <button
+          disabled={loading}
           type="submit"
           className="bg-[#06B6D4] text-black font-bold py-2 px-4 rounded mt-1 hover:bg-[#0284c7] transition-all"
         >
@@ -138,7 +141,7 @@ export default function LoginForm(props) {
 
         {/* Section: Create A/C */}
         <Link
-          to={"/signup"}
+          to={"/auth/signup"}
           className="text-[#06B6D4] text-left pl-2 font-bold underline italic"
         >
           Don't have an account? Sign Up here.
