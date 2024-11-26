@@ -3,7 +3,8 @@ import { MdOutlineDelete } from "react-icons/md";
 import { deleteComment } from "../../apis/postApi";
 
 export default function CommentCard(props) {
-  let { username, commentData, profilePic, postId, commentId } = props;
+  let { firstName, lastName, commentData, profilePic, postId, commentId } =
+    props;
   const [deleteCommentLoading, setDeleteCommentLoading] = useState(false);
 
   let handleDeleteComment = async (postId) => {
@@ -28,7 +29,9 @@ export default function CommentCard(props) {
           className="w-8 h-8 rounded-full object-cover"
         />
         <div className="flex flex-col">
-          <span className="text-gray-200 font-semibold">{username}</span>
+          <span className="text-gray-200 font-semibold">
+            {firstName} {lastName}
+          </span>
           <span className="text-gray-400 text-sm">{commentData}</span>
         </div>
         <button

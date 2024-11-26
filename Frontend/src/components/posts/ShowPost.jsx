@@ -134,7 +134,7 @@ export default function ShowPost() {
                 />
                 <div className="flex flex-col text-gray-200">
                   <h3 className="font-semibold text-sm md:text-lg">
-                    {post.owner.name}
+                    {post.owner.firstName} {post.owner.lastName}
                   </h3>
                   <h6 className="text-sm text-gray-500">{countryName}</h6>
                 </div>
@@ -234,7 +234,8 @@ export default function ShowPost() {
                       key={data._id}
                       postId={post._id}
                       commentId={data._id}
-                      username={data.user.name}
+                      firstName={data.user.firstName}
+                      lastName={data.user.lastName}
                       commentData={data.comment}
                       profilePic={data.user.profilePic.url}
                     />
