@@ -19,7 +19,6 @@ const axiosConfig = {
   withCredentials: true,
 };
 
-
 export const sendOTP = async (userData) => {
   try {
     const response = await axios.post(SEND_OTP_API_URL, userData, axiosConfig);
@@ -52,7 +51,9 @@ export const login = async (userData) => {
 
 export const logout = async () => {
   try {
-    const response = await axios.get(LOGOUT_API_URL, axiosConfig);
+    const response = await axios.get(LOGOUT_API_URL, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Error logging out:", error.response?.data || error.message);
@@ -69,7 +70,10 @@ export const requestPasswordResetOtp = async (userData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error requesting password reset OTP:", error.response?.data || error.message);
+    console.error(
+      "Error requesting password reset OTP:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -83,7 +87,10 @@ export const resetPassword = async (userData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error resetting password:", error.response?.data || error.message);
+    console.error(
+      "Error resetting password:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -93,7 +100,10 @@ export const deleteAccount = async () => {
     const response = await axios.delete(DELETE_ACCOUNT_API_URL, axiosConfig);
     return response.data;
   } catch (error) {
-    console.error("Error during delete :", error.response?.data || error.message);
+    console.error(
+      "Error while Deleting Account :",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
