@@ -1,13 +1,13 @@
-
-
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoMdMoon, IoIosNotifications } from "react-icons/io";
 import { PiQuestionMarkFill } from "react-icons/pi";
 import { MdMessage } from "react-icons/md";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { HiSearch } from "react-icons/hi";
 import DeleteAccount from "../forms/DeleteAccount";
+import toast from "react-hot-toast";
+import { deleteAccount, logout } from "../../apis/authApi";
 
 export default function Header() {
   let userName = "Vijay Kumar";
@@ -15,6 +15,8 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -32,12 +34,47 @@ export default function Header() {
     setModalOpen(true);
   };
 
+  let handleLogout = async () => {
+    try {
+      setLoading(true);
+      const response = await logout();
+      console.log("Response of logout: ", response);
+      navigate("/auth/login");
+      toast.success("User Logged out");
+    } catch (error) {
+      toast.error("Error while Logout");
+      console.log("Error while logout: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  let handleDeleteAccount = async () => {
+    const toastId = toast.loading("Deleting A/C..");
+    try {
+      setLoading(true);
+      const response = await deleteAccount();
+      console.log("Response of Deleting A/C: ", response);
+      navigate("/auth/signup");
+    } catch (error) {
+      toast.error("A/C not Deleted");
+      console.log("Error while deleting A/C.");
+    } finally {
+      toast.dismiss(toastId);
+      setModalOpen(false);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-[rgb(26,26,26)] z-[1000] w-full fixed">
       <header className="md:w-[90%] w-[100%] px-4 md:px-0 text-white m-auto py-5 flex justify-between items-center relative">
         {/* Logo Section */}
         <div className="flex items-center space-x-4">
-          <Link to="/" className="text-2xl md:text-3xl font-bold text-cyan-500 whitespace-nowrap">
+          <Link
+            to="/"
+            className="text-2xl md:text-3xl font-bold text-cyan-500 whitespace-nowrap"
+          >
             Link-Up
           </Link>
         </div>
@@ -83,16 +120,28 @@ export default function Header() {
           <div className="absolute top-full left-0 w-full bg-gray-800 z-10 md:hidden">
             <div className="flex flex-col items-center space-y-4 p-4">
               {/* Icons for Mobile Menu */}
-              <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
+              <Link
+                to="testPage"
+                className="text-xl text-white hover:text-cyan-500"
+              >
                 <IoMdMoon />
               </Link>
-              <Link to="/chat" className="text-xl text-white hover:text-cyan-500">
+              <Link
+                to="/chat"
+                className="text-xl text-white hover:text-cyan-500"
+              >
                 <MdMessage />
               </Link>
-              <Link to="notification" className="text-xl text-white hover:text-cyan-500">
+              <Link
+                to="notification"
+                className="text-xl text-white hover:text-cyan-500"
+              >
                 <IoIosNotifications />
               </Link>
-              <Link to="testPage" className="text-xl text-white hover:text-cyan-500">
+              <Link
+                to="testPage"
+                className="text-xl text-white hover:text-cyan-500"
+              >
                 <PiQuestionMarkFill />
               </Link>
 
@@ -106,7 +155,6 @@ export default function Header() {
                   {/* Updated SVG Path */}
                   <svg
                     className="-mr-1 ml-2 h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                     aria-hidden="true"
@@ -119,23 +167,48 @@ export default function Header() {
                 {isDropdownOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
-                      <Link to="update-profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                      <Link
+                        to="auth/login"
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="auth/signup"
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
+                        SignUp
+                      </Link>
+                      <Link
+                        to="update-profile"
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
                         Update Profile
                       </Link>
-                      <Link to="testPage" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                      <Link
+                        onClick={handleLogout}
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
                         Log Out
-                      </Link>
-                      <Link to="update-password" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
-                        Update Password
                       </Link>
                       <Link
                         to="update-password"
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
+                        Update Password
+                      </Link>
+                      <Link
                         onClick={handleOpenModal}
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                       >
                         Delete Account
                       </Link>
-                      <DeleteAccount isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
+                      <DeleteAccount
+                        handleDeleteAccount={handleDeleteAccount}
+                        loading={loading}
+                        isModalOpen={isModalOpen}
+                        setModalOpen={setModalOpen}
+                      />
                     </div>
                   </div>
                 )}
@@ -169,7 +242,6 @@ export default function Header() {
               {/* Updated SVG Path */}
               <svg
                 className="-mr-1 ml-2 h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 aria-hidden="true"
@@ -182,23 +254,48 @@ export default function Header() {
             {isDropdownOpen && (
               <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
-                  <Link to="update-profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                  <Link
+                    to="auth/login"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="auth/signup"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
+                    SignUp
+                  </Link>
+                  <Link
+                    to="update-profile"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
                     Update Profile
                   </Link>
-                  <Link to="update-password" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                  <Link
+                    to="update-password"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
                     Update Password
                   </Link>
-                  <Link to="testPage" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                  <Link
+                    onClick={handleLogout}
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
                     Log Out
                   </Link>
                   <Link
-                    to="testPage"
                     onClick={handleOpenModal}
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
                     Delete Account
                   </Link>
-                  <DeleteAccount isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
+                  <DeleteAccount
+                    handleDeleteAccount={handleDeleteAccount}
+                    loading={loading}
+                    isModalOpen={isModalOpen}
+                    setModalOpen={setModalOpen}
+                  />
                 </div>
               </div>
             )}
