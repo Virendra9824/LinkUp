@@ -73,7 +73,7 @@ export default function RegisterUpdateForm(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      if (profilePic) formData.append("profilePic", profilePic);
+      // if (profilePic) formData.append("profilePic", profilePic);
 
       // console.log("Form data submitted is:", formData);
 
