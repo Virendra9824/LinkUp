@@ -12,7 +12,20 @@ const userSchema = mongoose.Schema(
 			required: true,
 			trim: true,
 		},
-
+		userName: {
+			type: String,
+			required: true,
+			trim: true,
+			unique: true,
+			minlength: 5,
+			maxlength: 20,
+			match: /^[a-zA-Z0-9._]+$/,
+			lowercase: true,
+			default: function () {
+				const currentSecond = new Date().getSeconds();
+				return `its_${this.firstName.toLowerCase()}.${currentSecond}`;
+			},
+		},
 		email: {
 			type: String,
 			required: true,
@@ -31,6 +44,7 @@ const userSchema = mongoose.Schema(
 			type: String,
 			required: true,
 			enum: ["student", "teacher", "other"],
+			default: "student",
 		},
 		followers: [
 			{
