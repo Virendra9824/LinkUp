@@ -4,6 +4,9 @@ import { LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../apis/authApi";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { setToken } from "../../redux/slices/authSlice";
+import { setUser } from "../../redux/slices/profileSlice";
 
 export default function LoginForm(props) {
   // State for form inputs
@@ -17,6 +20,7 @@ export default function LoginForm(props) {
   const [formErrors, setFormErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   // Form validation function
   const validateForm = () => {
@@ -42,6 +46,11 @@ export default function LoginForm(props) {
       try {
         // AI-ML: INTEGRATED login FUNCTION FROM authApi.js
         const response = await login(formData);
+        dispatch(setToken(response.token));
+
+        dispatch(setUser(response.user));
+
+        localStorage.setItem("token", JSON.stringify(response.token));
 
         // Redirect to home page
         navigate("/");
