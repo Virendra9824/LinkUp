@@ -21,7 +21,25 @@ exports.myProfile = async (req, res) => {
 // Find user with give ID
 exports.userProfile = async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id).select("-password");
+		const userId = req.params.userId;
+		const user = await User.findById(userId)
+			.select("-password") // Exclude the password field from the User document
+			.populate({
+				path: "posts", // Populate the 'posts' field in the User document
+				populate: [
+					{
+						path: "owner", // Populate the 'owner' field inside each post
+						select: "-password", // Exclude the password field from the owner
+					},
+					{
+						path: "comments", // Populate the 'comments' field inside each post
+						populate: {
+							path: "user", // Optionally populate the 'user' field inside each comment
+							select: "-password", // Fetch only specific fields from the user (like name and email)
+						},
+					},
+				],
+			});
 
 		if (!user) {
 			return res.status(404).json({
@@ -37,7 +55,7 @@ exports.userProfile = async (req, res) => {
 			})
 			.exec();
 
-		return res.status(200).json({ user, followings });
+		return res.status(200).json({ user });
 	} catch (error) {
 		return res.status(500).json({
 			error: error,
@@ -50,7 +68,7 @@ exports.userProfile = async (req, res) => {
 // Follow and UnFollow user
 exports.followAndUnfollowUser = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id).select("-password");
+		const user = await User.findById(req.params.userId).select("-password");
 
 		const loggedInUser = await User.findById(req.user.id).select(
 			"-password"
