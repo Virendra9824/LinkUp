@@ -16,8 +16,8 @@ const router = express.Router();
 
 router.get("/me", isAuth, myProfile);
 router.get("/all", isAuth, getAllUsers);
-router.get("/:id", isAuth, userProfile);
-router.post("/follow/:id", isAuth, followAndUnfollowUser);
+router.post("/:userId", isAuth, userProfile);
+router.post("/follow/:userId", isAuth, followAndUnfollowUser);
 router.get("/followers/:id", isAuth, followersData);
 router.get("/followings", isAuth, followingsData);
 router.put("/updateprofile", isAuth, uploadFile, updateProfile);
