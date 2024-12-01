@@ -25,4 +25,6 @@ export const postEndpoints = {
 // USER ENDPOINTS
 export const userEndpoints = {
   GET_FOLLOWINGS_API_URL: BASE_URL + "/user/followings",
+  GET_USER_BY_ID: BASE_URL + "/user",
+  FOLLOW_UNFOLLOW_USER_API_URL: BASE_URL + "/user/follow",
 };
