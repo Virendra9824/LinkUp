@@ -5,11 +5,13 @@ import { BsThreeDots } from "react-icons/bs";
 import ImageUploader from "../common/ImageUploader";
 import { createPost } from "../../apis/postApi";
 import EmojiPicker from "emoji-picker-react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 export default function CreatePost() {
   const [showImageArea, setShowImageArea] = useState(false); // STATE FOR IMAGE AREA
-  const profilePic =
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  const loggedInUser = useSelector((state) => state.profile.user);
+  const profilePic = loggedInUser?.profilePic?.url;
 
   const [loading, setLoading] = useState(false);
   const [postCaption, setPostCaption] = useState("");
@@ -21,7 +23,6 @@ export default function CreatePost() {
     setPostCaption((prevInput) => prevInput + emojiData.emoji);
   };
 
-  // To be Done by Vijay
   const fetchCurrentUserDetails = () => {
     try {
       setLoading(true);
@@ -73,11 +74,14 @@ export default function CreatePost() {
         {" "}
         <div className="flex gap-x-4 items-center">
           {/* Profile Image */}
-          <img
-            src={profilePic}
-            alt="profile"
-            className="rounded-full w-9  md:w-12  object-cover aspect-square"
-          />
+          <Link to={`/user/${loggedInUser?._id}`}>
+            <img
+              src={profilePic}
+              alt="profile"
+              className="rounded-full w-9  md:w-12  object-cover aspect-square"
+            />
+          </Link>
+
           {/* Input Text */}
           <input
             type="text"
