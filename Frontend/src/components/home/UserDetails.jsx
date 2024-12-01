@@ -7,9 +7,11 @@ import { IoIosBriefcase } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 import DeleteAccount from "../forms/DeleteAccount";
+import { useSelector } from "react-redux";
 
 export default function UserDetails() {
   const [isModalOpen, setModalOpen] = useState(false);
+  const loggedInUser = useSelector((state) => state.profile.user);
 
   // Function to open the modal
   const handleOpenModal = () => {
@@ -25,16 +27,26 @@ export default function UserDetails() {
         <div className="max-w-xxl  text-white rounded-lg shadow-lg ">
           <div className="flex items-center justify-between">
             <div className="flex gap-x-2 items-center  ">
-              <img
-                src={profilePic} // Replace with actual image URL
-                alt="profile"
-                className="aspect-square xs:w-12 w-10 rounded-full "
-              />
+              <Link to={`/user/${loggedInUser?._id}`}>
+                <img
+                  src={loggedInUser?.profilePic?.url}
+                  alt="profile"
+                  className="aspect-square xs:w-12 w-10 rounded-full "
+                />
+              </Link>
+
               <div className="flex flex-col justify-center items-start">
                 {" "}
                 {/* Adjusted classes here */}
-                <h2 className="text-xl font-semibold">cat sharma</h2>
-                <p className="text-gray-400">3 friends</p>
+                <Link
+                  to={`/user/${loggedInUser?._id}`}
+                  className="text-xl font-semibold"
+                >
+                  {loggedInUser?.firstName} {loggedInUser?.lastName}
+                </Link>
+                <p className="text-gray-400">
+                  {loggedInUser?.followings?.length} Friends
+                </p>
               </div>
             </div>
             <div className="text-center">
@@ -113,11 +125,11 @@ export default function UserDetails() {
               className="w-full  text-center inline-block  bg-red-500 text-black hover:text-red-500 hover:bg-[#291818] duration-200 py-1 px-2 rounded-md"
             >
               Delete Account
-
             </Link>
-            <DeleteAccount isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
-
-            
+            <DeleteAccount
+              isModalOpen={isModalOpen}
+              setModalOpen={setModalOpen}
+            />
           </div>
         </div>
       </div>
