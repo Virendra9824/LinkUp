@@ -54,6 +54,9 @@ export const logout = async () => {
     const response = await axios.get(LOGOUT_API_URL, {
       withCredentials: true,
     });
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     return response.data;
   } catch (error) {
     console.error("Error logging out:", error.response?.data || error.message);
