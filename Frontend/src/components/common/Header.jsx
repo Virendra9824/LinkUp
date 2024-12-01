@@ -8,15 +8,23 @@ import { HiSearch } from "react-icons/hi";
 import DeleteAccount from "../forms/DeleteAccount";
 import toast from "react-hot-toast";
 import { deleteAccount, logout } from "../../apis/authApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setToken } from "../../redux/slices/authSlice";
+import { setUser } from "../../redux/slices/profileSlice";
 
 export default function Header() {
-  let userName = "Vijay Kumar";
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const loggedInUser = useSelector((state) => state.profile.user);
+  const userId = loggedInUser?._id;
+  let userName = `${loggedInUser?.firstName || "Logged"} ${
+    loggedInUser?.lastName || "Out"
+  }`;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -38,6 +46,8 @@ export default function Header() {
     try {
       setLoading(true);
       const response = await logout();
+      dispatch(setToken(null));
+      dispatch(setUser(null));
       console.log("Response of logout: ", response);
       navigate("/auth/login");
       toast.success("User Logged out");
@@ -127,7 +137,7 @@ export default function Header() {
                 <IoMdMoon />
               </Link>
               <Link
-                to="/chat"
+                to="/chat/me"
                 className="text-xl text-white hover:text-cyan-500"
               >
                 <MdMessage />
@@ -167,6 +177,12 @@ export default function Header() {
                 {isDropdownOpen && (
                   <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
+                      <Link
+                        to={`/user/${userId}`}
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
+                        MyProfile
+                      </Link>
                       <Link
                         to="auth/login"
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
@@ -222,7 +238,7 @@ export default function Header() {
           <Link to="testPage" className="text-xl cursor-pointer">
             <IoMdMoon />
           </Link>
-          <Link to="/chat" className="text-xl cursor-pointer">
+          <Link to="/chat/me" className="text-xl cursor-pointer">
             <MdMessage />
           </Link>
           <Link to="notification" className="text-xl cursor-pointer">
@@ -254,6 +270,12 @@ export default function Header() {
             {isDropdownOpen && (
               <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
+                  <Link
+                    to={`/user/${userId}`}
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
+                    MyProfile
+                  </Link>
                   <Link
                     to="auth/login"
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
