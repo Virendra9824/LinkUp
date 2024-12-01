@@ -204,7 +204,9 @@ exports.login = async (req, res) => {
 		}
 
 		// Check if user exists in the database
-		const user = await User.findOne({ email });
+		const user = await User.findOne({ email }).populate(
+			"posts followings followers"
+		);
 		if (!user) {
 			return res.status(404).json({
 				success: false,
@@ -223,25 +225,24 @@ exports.login = async (req, res) => {
 
 		// Create a JWT token for the user
 		const token = generateToken(user._id, res); // Capture the token
-		user.password = null; // Remove sensitive data before sending the response
+
+		// Convert to plain object and delete password field
+		const userObj = user.toObject();
+		delete userObj.password;
 
 		// Send success response with token
 		res.status(200).json({
 			success: true,
 			message: "Login successful",
 			token, // Send the JWT token
-			user: {
-				firstName: user.firstName,
-				lastName: user.lastName,
-				email: user.email,
-				image: user.image, // Include user image URL if needed
-			},
+			user: userObj,
 		});
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({
 			success: false,
-			message: "Error occured in Login :",
+			message: "Error occurred while login ",
+			error,
 		});
 	}
 };
