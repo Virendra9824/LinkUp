@@ -133,7 +133,7 @@ export default function LoginForm(props) {
 
         {/* Section: Forgot-Password */}
         <Link
-          to={"/update-password"}
+          to={"/auth/reset-password"}
           className="text-[#06B6D4] text-left pl-2 font-semibold underline italic"
         >
           Forgot password ?
