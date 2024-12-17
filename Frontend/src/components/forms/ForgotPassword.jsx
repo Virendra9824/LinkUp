@@ -1,26 +1,19 @@
 import React, { useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
-import { Link, useNavigate } from "react-router-dom";
-import ImageUploader from "../common/ImageUploader";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { requestPasswordResetOtp, resetPassword } from "../../apis/authApi";
-import { signUp } from "../../apis/authApi";
-import { useSelector } from "react-redux";
 
 export default function ForgotPassword(props) {
   const { isUpdateForm } = props;
 
   // State for form inputs
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
     otp: "",
-    gender: "male",
-    role: "student",
   });
 
   // State for form errors
@@ -31,21 +24,16 @@ export default function ForgotPassword(props) {
   const [loading, setLoading] = useState(false);
   const [sendOtpBtnMessage, setSendOtpBtnMessage] = useState("Send OTP");
   const navigate = useNavigate();
-  const [profilePic, setProfilePic] = useState(null);
-
-  const loggedInUser = useSelector((state) => state.profile.user.email);
 
   // Form validation function
   const validateForm = () => {
     let errors = {};
 
-    
     if (!formData.email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "Email is invalid";
     }
-    
 
     if (!formData.password) {
       errors.password = "Password is required";
@@ -67,31 +55,19 @@ export default function ForgotPassword(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      
-
       const toastId = toast.loading("Loading...");
       try {
         setLoading(true);
         const response = await resetPassword(formData);
         console.log("Response of update Password: ", response);
-        toast.success("password change successfully");
+        toast.success("Password changed successfully");
         navigate("/auth/login");
       } catch (error) {
-        toast.error("Invalid OTP.");
+        toast.error(error?.message);
         console.log("Error while update password: ", error);
       } finally {
         toast.dismiss(toastId);
         setLoading(false);
-        // setFormData({
-        //   firstName: "",
-        //   lastName: "",
-        //   email: "",
-        //   password: "",
-        //   confirmPassword: "",
-        //   otp: "",
-        //   gender: "male",
-        //   role: "student",
-        // });
       }
     }
   };
@@ -103,14 +79,10 @@ export default function ForgotPassword(props) {
   };
 
   const handleSendOTP = async (email) => {
-
     if (!email) {
       toast.error("Email is required");
       return;
-    } else if (email !== loggedInUser) {
-      toast.error("Email is invalid");
-      return;
-    } 
+    }
     const toastId = toast.loading("Loading...");
     try {
       setLoading(true);
@@ -130,28 +102,17 @@ export default function ForgotPassword(props) {
   };
 
   return (
-    <div className="bg-[#1A1A1A] w-11/12 xs:w-[95%] sm:w-[80%] md:w-[50%] p-3 sm:p-4 md:p-7 mx-auto flex flex-col justify-between gap-4 rounded-xl">
+    <div className="bg-[#1A1A1A] my-6 w-11/12 xs:w-[95%] sm:w-[80%] md:w-[50%] p-3 sm:p-4 md:p-7 mx-auto flex flex-col justify-between gap-4 rounded-xl">
       <h1 className="text-white font-bold text-xl">
         Welcome to LinkUp,{" "}
-        {isUpdateForm
-          ? "update your profile!"
-          : " the Social Media for Sociopaths!"}
+        {isUpdateForm ? "update your profile!" : " reset your password."}
       </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Section: First and Last Name */}
-        
-
-        {/* Section: Gender and Role */}
-        
-
-        {/* Section: Profile Picture */}
-        
-
         {/* Section: Password */}
         {/* show/hide Icons tag LuEyeOff and LuEye */}
         <div className="flex flex-col">
           <label className="relative z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
-            Password
+            New Password
           </label>
           <div className="relative">
             <input
@@ -184,7 +145,7 @@ export default function ForgotPassword(props) {
         {/* Section: Confirm Password */}
         <div className="flex flex-col">
           <label className="relative z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
-            Confirm Password
+            Confirm New Password
           </label>
           <div className="relative">
             <input
@@ -214,12 +175,10 @@ export default function ForgotPassword(props) {
           )}
         </div>
 
-        
-
         {/* Section: Email */}
         <div className="flex flex-col">
           <label className="relative  z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
-            Email
+            Registered Email
           </label>
           <div className="relative">
             <input
@@ -279,9 +238,8 @@ export default function ForgotPassword(props) {
             loading ? "cursor-not-allowed" : ""
           } bg-[#06B6D4] text-black font-bold py-2 px-4 rounded mt-4 hover:bg-[#0284c7] transition-all`}
         >
-          {isUpdateForm ? "Update Profile" : "Register"}
+          Reset Password
         </button>
-
       </form>
     </div>
   );
