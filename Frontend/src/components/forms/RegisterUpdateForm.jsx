@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,20 +6,25 @@ import ImageUploader from "../common/ImageUploader";
 import toast from "react-hot-toast";
 import { sendOTP } from "../../apis/authApi";
 import { signUp } from "../../apis/authApi";
+import { useSelector } from "react-redux";
+import { updateProfile } from "../../apis/userApi";
 
 export default function RegisterUpdateForm(props) {
   const { isUpdateForm } = props;
+  const loggedInUser = useSelector((state) => state.profile.user);
 
   // State for form inputs
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
     otp: "",
     gender: "male",
     role: "student",
+    bio: "",
   });
 
   // State for form errors
@@ -32,10 +37,65 @@ export default function RegisterUpdateForm(props) {
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState(null);
 
+  // Validate the userName.
+  let isValidUsername = (username) => {
+    const usernameRegex = /^[a-zA-Z0-9._]+$/;
+    const minLength = 5;
+    const maxLength = 20;
+
+    if (username?.length < minLength || username?.length > maxLength) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        userName: "Username must be between 5 and 20 characters long.",
+      }));
+      return false;
+    }
+    if (!usernameRegex.test(username)) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        userName:
+          "Username can only contain letters, numbers, dots, and underscores.",
+      }));
+      return false;
+    }
+
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      userName: "",
+    }));
+    return true;
+  };
+
+  // Validate the bio.
+  let isValidBio = (bio) => {
+    const minLength = 5;
+    const maxLength = 50;
+
+    if (bio?.length < minLength || bio?.length > maxLength) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        bio: "Bio must be between 5 and 50 chars long.",
+      }));
+      return false;
+    }
+
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      bio: "",
+    }));
+    return true;
+  };
+
   // Form validation function
   const validateForm = () => {
     let errors = {};
 
+    if (isUpdateForm && !formData.userName.trim()) {
+      errors.userName = "Username is required";
+    }
+    if (isUpdateForm && !formData.bio.trim()) {
+      errors.bio = "Bio is required";
+    }
     if (!formData.firstName.trim()) {
       errors.firstName = "First name is required";
     }
@@ -48,19 +108,22 @@ export default function RegisterUpdateForm(props) {
     if (!formData.role) {
       errors.role = "Role is required";
     }
-    if (!formData.email) {
+    if (!isUpdateForm && !formData.email) {
       errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email) && !isUpdateForm) {
       errors.email = "Email is invalid";
     }
     if (!formData.password) {
       errors.password = "Password is required";
     }
-    if (formData.password !== formData.confirmPassword) {
+    if (!isUpdateForm && formData.password !== formData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
-    if (!formData.otp) {
+    if (!isUpdateForm && !formData.otp) {
       errors.otp = "OTP is required";
+    }
+    if (isUpdateForm && !profilePic) {
+      errors.profilePic = "Profile picture is required";
     }
 
     setFormErrors(errors);
@@ -69,18 +132,31 @@ export default function RegisterUpdateForm(props) {
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission
+  // Handle form submission for both register and update
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // if (profilePic) formData.append("profilePic", profilePic);
 
-      // console.log("Form data submitted is:", formData);
+    // For sending files, simple js object is not suitable.
+    const formDataToSend = new FormData(); // Create a FormData instance
+
+    // Append all fields from the formData object
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+
+    // New User Register Form
+    if (!isUpdateForm && validateForm()) {
+      if (profilePic) formDataToSend.append("file", profilePic);
+
+      // console.log("Form data submitted is:");
+      // for (let [key, value] of formDataToSend.entries()) {
+      //   console.log(`${key}:`, value);
+      // }
 
       const toastId = toast.loading("Loading...");
       try {
         setLoading(true);
-        const response = await signUp(formData);
+        const response = await signUp(formDataToSend);
         console.log("Response of Signup form: ", response);
         toast.success("Signup successfully");
         navigate("/auth/login");
@@ -102,6 +178,46 @@ export default function RegisterUpdateForm(props) {
         // });
       }
     }
+
+    // Update profile Form
+    if (isUpdateForm && validateForm()) {
+      if (profilePic) formDataToSend.append("file", profilePic);
+
+      // console.log("Form data submitted is:");
+      // for (let [key, value] of formDataToSend.entries()) {
+      //   console.log(`${key}:`, value);
+      // }
+
+      if (!isValidUsername(formDataToSend.get("userName"))) {
+        toast.error("Invalid username.");
+        return;
+      }
+
+      if (!isValidBio(formDataToSend.get("bio"))) {
+        toast.error("Invalid Bio.");
+        return;
+      }
+
+      const toastId = toast.loading("Loading...");
+      try {
+        setLoading(true);
+        const response = await updateProfile(formDataToSend);
+        console.log("Response of updateProfile form: ", response);
+
+        if (response?.success) {
+          toast.success("Profile updated successfully");
+          navigate(`/user/${loggedInUser?._id}`);
+        } else {
+          toast.error(response?.message || "Error updating profile");
+        }
+      } catch (error) {
+        toast.error("Invalid Password.");
+        console.log("Error in update profile: ", error);
+      } finally {
+        toast.dismiss(toastId);
+        setLoading(false);
+      }
+    }
   };
 
   // Handle input change
@@ -116,7 +232,7 @@ export default function RegisterUpdateForm(props) {
       setLoading(true);
       setSendOtpLoading(true);
       const response = await sendOTP({ email });
-      console.log("Response of OTP sent: ", response);
+      // console.log("Response of OTP sent: ", response);
       toast.success("OTP sent");
     } catch (error) {
       toast.error("OTP not sent");
@@ -129,6 +245,25 @@ export default function RegisterUpdateForm(props) {
     }
   };
 
+  const setInitialUserData = () => {
+    setProfilePic(loggedInUser?.profilePic?.url);
+    setFormData({
+      firstName: loggedInUser?.firstName,
+      lastName: loggedInUser?.lastName,
+      userName: loggedInUser?.userName,
+      gender: loggedInUser?.gender,
+      role: loggedInUser?.role,
+      bio: loggedInUser?.bio ? loggedInUser?.bio : "Login Again!",
+      password: "",
+    });
+  };
+
+  useEffect(() => {
+    if (isUpdateForm) {
+      setInitialUserData();
+    }
+  }, []);
+
   return (
     <div className="bg-[#1A1A1A] w-11/12 xs:w-[95%] sm:w-[80%] md:w-[50%] p-3 sm:p-4 md:p-7 mx-auto flex flex-col justify-between gap-4 rounded-xl">
       <h1 className="text-white font-bold text-xl">
@@ -138,6 +273,50 @@ export default function RegisterUpdateForm(props) {
           : " the Social Media for Sociopaths!"}
       </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Section: Unique UserName */}
+        {isUpdateForm && (
+          <div className="flex flex-col w-full">
+            <label className="relative top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
+              Username
+            </label>
+            <input
+              type="text"
+              name="userName"
+              value={formData.userName}
+              onChange={handleInputChange}
+              placeholder="Enter your first name"
+              className="py-2 px-4 bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
+            />
+            {formErrors.userName && (
+              <p className="text-red-500 text-xs mt-1 pl-1">
+                {formErrors.userName} <sup>*</sup>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Section: Bio */}
+        {isUpdateForm && (
+          <div className="flex flex-col w-full">
+            <label className="relative top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
+              Bio/Tagline
+            </label>
+            <input
+              type="text"
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              placeholder="Enter bio (max 50 chars)"
+              className="py-2 px-4 bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
+            />
+            {formErrors.bio && (
+              <p className="text-red-500 text-xs mt-1 pl-1">
+                {formErrors.bio} <sup>*</sup>
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Section: First and Last Name */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-col w-full md:w-[48%]">
@@ -234,10 +413,15 @@ export default function RegisterUpdateForm(props) {
             <div className="m-4 w-full rounded-md border-2 border-dashed border-[#00D5FA] text-center text-gray-400">
               <ImageUploader
                 setPostImage={setProfilePic}
-                thumbnailLink={props?.isUpdateForm ? props.profilePic : null}
+                thumbnailLink={props?.isUpdateForm ? profilePic : null}
               />
             </div>
           </div>
+          {formErrors.profilePic && (
+            <p className="text-red-500 text-xs mt-1 pl-1">
+              {formErrors.profilePic} <sup>*</sup>
+            </p>
+          )}
         </div>
 
         {/* Section: Password */}
@@ -275,42 +459,44 @@ export default function RegisterUpdateForm(props) {
         </div>
 
         {/* Section: Confirm Password */}
-        <div className="flex flex-col">
-          <label className="relative z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              placeholder="Confirm your password"
-              className="py-2 px-4 w-full bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
-            />
-            <div
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-2 top-[22%]"
-            >
-              {!showConfirmPassword ? (
-                <LuEye className="cursor-pointer" size={24} />
-              ) : (
-                <LuEyeOff className="cursor-pointer" size={24} />
-              )}
+        {!isUpdateForm && (
+          <div className="flex flex-col">
+            <label className="relative z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="Confirm your password"
+                className="py-2 px-4 w-full bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
+              />
+              <div
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-2 top-[22%]"
+              >
+                {!showConfirmPassword ? (
+                  <LuEye className="cursor-pointer" size={24} />
+                ) : (
+                  <LuEyeOff className="cursor-pointer" size={24} />
+                )}
+              </div>
             </div>
-          </div>
 
-          {formErrors.confirmPassword && (
-            <p className="text-red-500 text-xs mt-1 pl-1">
-              {formErrors.confirmPassword} <sup>*</sup>
-            </p>
-          )}
-        </div>
+            {formErrors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1 pl-1">
+                {formErrors.confirmPassword} <sup>*</sup>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Section: Forgot-Password */}
         {isUpdateForm && (
           <Link
-            to={"/update-password"}
+            to={"/auth/update-password"}
             className="text-[#06B6D4] text-left pl-2 font-bold underline italic"
           >
             Forgot password ?
@@ -318,35 +504,37 @@ export default function RegisterUpdateForm(props) {
         )}
 
         {/* Section: Email */}
-        <div className="flex flex-col">
-          <label className="relative  z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
-            Email
-          </label>
-          <div className="relative">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your email"
-              className="py-2 px-4 w-full bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
-            />
-            <button
-              onClick={() => handleSendOTP(formData.email)}
-              disabled={sendOtpLoading}
-              className={`${
-                sendOtpLoading ? "cursor-not-allowed" : ""
-              } absolute right-2 top-[12%] bg-[#06B6D4] text-black font-semibold py-1 px-3 rounded  hover:bg-[#0284c7] transition-all`}
-            >
-              {sendOtpBtnMessage}
-            </button>
+        {!isUpdateForm && (
+          <div className="flex flex-col">
+            <label className="relative  z-20 top-2 w-fit px-1 bg-[#1A1A1A] text-sm left-3 text-[#06B6D4]">
+              Email
+            </label>
+            <div className="relative">
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter your email"
+                className="py-2 px-4 w-full bg-[#1A1A1A] text-white border border-gray-500 rounded focus:outline-none focus:border-2 focus:border-[#06B6D4]"
+              />
+              <button
+                onClick={() => handleSendOTP(formData.email)}
+                disabled={sendOtpLoading}
+                className={`${
+                  sendOtpLoading ? "cursor-not-allowed" : ""
+                } absolute right-2 top-[12%] bg-[#06B6D4] text-black font-semibold py-1 px-3 rounded  hover:bg-[#0284c7] transition-all`}
+              >
+                {sendOtpBtnMessage}
+              </button>
+            </div>
+            {formErrors.email && (
+              <p className="text-red-500 text-xs mt-1 pl-1">
+                {formErrors.email} <sup>*</sup>
+              </p>
+            )}
           </div>
-          {formErrors.email && (
-            <p className="text-red-500 text-xs mt-1 pl-1">
-              {formErrors.email} <sup>*</sup>
-            </p>
-          )}
-        </div>
+        )}
 
         {/* Section: OTP */}
         {!isUpdateForm && (
