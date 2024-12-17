@@ -9,7 +9,7 @@ export const authEndpoints = {
   DELETE_ACCOUNT_API_URL: BASE_URL + "/auth/delete-account",
   PASSWORD_RESET_OTP_API_URL: BASE_URL + "/auth/reset-password-otp",
   PASSWORD_RESET_API_URL: BASE_URL + "/auth/reset-password",
-  CHANGE_PASSWORD_API_URL: BASE_URL + "/auth/change-password"
+  CHANGE_PASSWORD_API_URL: BASE_URL + "/auth/change-password",
 };
 
 // POST ENDPOINTS
@@ -28,4 +28,5 @@ export const userEndpoints = {
   GET_FOLLOWINGS_API_URL: BASE_URL + "/user/followings",
   GET_USER_BY_ID: BASE_URL + "/user",
   FOLLOW_UNFOLLOW_USER_API_URL: BASE_URL + "/user/follow",
+  UPDATE_PROFILE_API_URL: BASE_URL + "/user/updateprofile",
 };
