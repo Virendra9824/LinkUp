@@ -10,6 +10,7 @@ const { uploadImageToCloudinary } = require("../utils/imageUploader");
 const generateToken = require("../utils/generateToken");
 const { error } = require("console");
 
+
 const cloudinary = require("cloudinary").v2; // Ensure Cloudinary is required
 
 //sendOTP
@@ -247,41 +248,44 @@ exports.login = async (req, res) => {
 	}
 };
 
-// Request New OTP for Password Reset
+
+
+
+// Generate and Send OTP
 exports.requestPasswordResetOtp = async (req, res) => {
+
 	try {
 		const { email } = req.body;
+		
+		
+	   
+		
 
-		// Validate if email is provided
+		// Step 2: Validate if email exists
 		if (!email) {
 			return res.status(400).json({
 				success: false,
 				message: "Email is required",
 			});
 		}
+		
+		
 
-		// Check if user exists in the database
-		const user = await User.findOne({ email });
-		if (!user) {
-			return res.status(404).json({
-				success: false,
-				message: "User not found",
-			});
+		// Step 3: Generate OTP
+		function generateOtp() {
+			return (Date.now() % 1000000).toString().padStart(6, "0");
 		}
 
-		// Generate a new OTP
-		const otp = (Date.now() % 1000000).toString().padStart(6, "0"); // Generate OTP using timestamp (you can use other methods if needed)
-		console.log("OTP generated:", otp);
+		const otp = generateOtp();
+		console.log("OTP generated: ", otp);
 
-		// Create OTP record
+		// Step 4: Save OTP in the database
 		const otpPayload = { email, otp };
-		await OTP.create(otpPayload); // Save OTP in the database
+		const otpBody = await OTP.create(otpPayload);
+		console.log("OTP generated info: ", otpBody);
 
-		// Send OTP to the user (You can integrate email service to actually send the OTP)
-		console.log(`Sending OTP: ${otp} to ${email}`);
-
-		// Respond with success
-		res.status(200).json({
+		// Step 5: Respond with success message
+		return res.status(200).json({
 			success: true,
 			message: "OTP sent successfully",
 		});
@@ -289,92 +293,120 @@ exports.requestPasswordResetOtp = async (req, res) => {
 		console.error(error);
 		return res.status(500).json({
 			success: false,
-			message: "Internal server error. Please try again later.",
+			message: "Internal server error",
 		});
 	}
 };
 
-// Reset Password Controller
+
+
+// Reset Password
 exports.resetPassword = async (req, res) => {
 	try {
-		const { email, otp, newPassword, confirmPassword } = req.body;
+		const { email, otp, password, confirmPassword } = req.body;
+		
 
-		// Validate required fields
-		if (!email || !otp || !newPassword || !confirmPassword) {
-			return res.status(400).json({
-				success: false,
-				message: "All fields are required",
-			});
+        
+		// Validate fields
+		if (!email || !otp || !password || !confirmPassword) {
+			return res.status(400).json({ success: false, message: "All fields are required" });
 		}
 
-		// Check if new password and confirm password match
-		if (newPassword !== confirmPassword) {
-			return res.status(400).json({
-				success: false,
-				message: "Password and Confirm Password must match",
-			});
+		if (password !== confirmPassword) {
+			return res.status(400).json({ success: false, message: "Passwords do not match" });
 		}
 
-		// Fetch the most recent OTP for the user
-		const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 }); // Fetch only the most recent OTP
-		console.log("Recent OTP fetched:", recentOtp); // Log the entire OTP object
-		console.log("request.body otp", otp);
-		if (!recentOtp) {
-			return res.status(400).json({
-				success: false,
-				message: "OTP Not Found",
-			});
-		}
+		// Find most recent OTP
+		const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
+		// if (!recentOtp || recentOtp.otp !== otp) {
+		// 	return res.status(400).json({ success: false, message: "Invalid OTP" });
+		// }
 
-		// Check if OTP matches the one stored in the database
-		if (otp !== recentOtp.otp) {
+		if (Number(otp) !== Number(recentOtp.otp)) {
+			console.log("Received OTP:", otp);
+			console.log("Stored OTP:", recentOtp.otp);
 			return res.status(400).json({
 				success: false,
 				message: "Invalid OTP",
 			});
 		}
 
-		// Optionally, check if the OTP is expired
-		const otpExpirationTime = 10 * 60 * 1000; // 10 minutes
-		const otpAge = Date.now() - new Date(recentOtp.createdAt).getTime();
 
-		if (otpAge > otpExpirationTime) {
-			return res.status(400).json({
-				success: false,
-				message: "OTP has expired. Please request a new OTP",
-			});
+		// Check OTP expiry
+		const otpAge = Date.now() - new Date(recentOtp.createdAt).getTime();
+		if (otpAge > 10 * 60 * 1000) {
+			return res.status(400).json({ success: false, message: "OTP has expired" });
 		}
 
-		// Hash the new password
-		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		// Hash new password
+		const hashedPassword = await bcrypt.hash(password, 10);
 
-		// Update the password in the User collection
+		// Update password
 		const user = await User.findOne({ email });
 		if (!user) {
-			return res.status(404).json({
-				success: false,
-				message: "User not found",
-			});
+			return res.status(404).json({ success: false, message: "User not found" });
 		}
 
-		// Update the user's password
 		user.password = hashedPassword;
 		await user.save();
 
-		// Return success response
-		return res.status(200).json({
-			success: true,
-			message: "Password updated successfully",
-		});
+		return res.status(200).json({ success: true, message: "Password reset successfully" });
 	} catch (error) {
-		console.log(error);
-		return res.status(500).json({
-			success: false,
-			message: "Error Occured in resetPassword",
-			error: error,
-		});
+		console.error(error);
+		return res.status(500).json({ success: false, message: "Internal server error" });
 	}
 };
+
+
+
+exports.changePassword = async (req, res) => {
+	try {
+	  // Get user data from req.user
+	  const userDetails = await User.findById(req.user.id);
+  
+	  // Get old password, new password, and confirm new password from req.body
+	  const { oldPassword, newPassword } = req.body;
+	  console.log("old password : ", oldPassword);
+	  console.log("new password : ", newPassword);
+  
+	  // Validate old password
+	  const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+	  console.log(userDetails.password); // Hashed password in the database
+	  console.log("old password ", oldPassword); // Plain-text password entered by user
+  
+	  if (!isPasswordMatch) {
+		// If old password does not match, return a 401 (Unauthorized) error
+		return res.status(401).json({
+		  success: false,
+		  message: "The password is incorrect",
+		});
+	  }
+  
+	  // Update password
+	  const encryptedPassword = await bcrypt.hash(newPassword, 10);
+	  const updatedUserDetails = await User.findByIdAndUpdate(
+		req.user.id,
+		{ password: encryptedPassword },
+		{ new: true }
+	  );
+  
+	  // Return success response
+	  return res.status(200).json({
+		success: true,
+		message: "Password updated successfully",
+	  });
+	} catch (error) {
+	  // If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
+	  console.error("Error occurred while updating password:", error);
+	  return res.status(500).json({
+		success: false,
+		message: "Error occurred while updating password",
+		error: error.message,
+	  });
+	}
+  };
+  
+
 
 exports.logoutUser = async (req, res) => {
 	try {
