@@ -102,8 +102,16 @@ export default function UserInfo({ user, isLoggedInUser }) {
           <h2 className="font-semibold">
             {user.firstName} {user.lastName}
           </h2>
-          <p className="text-gray-400">Student</p>
-          <p className="text-gray-200">Jay Shree Ram 🚩</p>
+          <p className="text-gray-400">
+            {user.role === "student"
+              ? "Student"
+              : user.role === "teacher"
+              ? "Teacher"
+              : "Personnel"}
+          </p>
+          <p className="text-gray-200 italic">
+            {user?.bio ? user?.bio : "Login again."}
+          </p>
         </div>
       </div>
     </div>
