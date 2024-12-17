@@ -9,6 +9,7 @@ const {
   PASSWORD_RESET_OTP_API_URL,
   PASSWORD_RESET_API_URL,
   DELETE_ACCOUNT_API_URL,
+  CHANGE_PASSWORD_API_URL
 } = authEndpoints;
 
 // Handle common Axios options
@@ -64,38 +65,43 @@ export const logout = async () => {
   }
 };
 
+export const changePassword = async (userData) => {
+	try {
+		const response = await axios.post(
+			CHANGE_PASSWORD_API_URL,
+			userData,
+			axiosConfig
+		);
+		return response.data;
+	} catch (error) {
+		throw error.response?.data || error.message;
+	}
+};
+
 export const requestPasswordResetOtp = async (userData) => {
-  try {
-    const response = await axios.post(
-      PASSWORD_RESET_OTP_API_URL,
-      userData,
-      axiosConfig
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error requesting password reset OTP:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
+	try {
+		const response = await axios.post(
+			PASSWORD_RESET_OTP_API_URL,
+			userData,
+			axiosConfig
+		);
+		return response.data;
+	} catch (error) {
+		throw error.response?.data || error.message;
+	}
 };
 
 export const resetPassword = async (userData) => {
-  try {
-    const response = await axios.post(
-      PASSWORD_RESET_API_URL,
-      userData,
-      axiosConfig
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error resetting password:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
+	try {
+		const response = await axios.post(
+			PASSWORD_RESET_API_URL,
+			userData,
+			axiosConfig
+		);
+		return response.data;
+	} catch (error) {
+		throw error.response?.data || error.message;
+	}
 };
 
 export const deleteAccount = async () => {

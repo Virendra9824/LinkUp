@@ -13,9 +13,10 @@ import Notification from "./pages/Notification";
 import RegisterUpdateForm from "./components/forms/RegisterUpdateForm";
 import { Toaster } from "react-hot-toast";
 import UserDetails from "./pages/UserDetails";
-import ShowPost from "./components/posts/ShowPost";
+// import ShowPost from "./components/posts/ShowPost";
 import UserSpecificPosts from "./components/posts/UserSpecificPosts";
 import Error from "./pages/Error";
+import ForgotPassword from "./components/forms/ForgetPassword";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path={"/notification"} element={<Notification />} />
           <Route path={"/update-profile"} element={<UpdateProfile />} />
           <Route path={"/auth/update-password"} element={<UpdatePassword />} />
+          <Route path={"/auth/reset-password"} element={<ForgotPassword />} />
           <Route path={"/auth/delete-account"} element={<DeleteAccount />} />
           <Route path={"/auth/register"} element={<RegisterUpdateForm />} />
           <Route path={"/auth/login"} element={<Login />} />
