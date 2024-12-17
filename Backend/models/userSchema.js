@@ -26,6 +26,17 @@ const userSchema = mongoose.Schema(
 				return `its_${this.firstName.toLowerCase()}.${currentSecond}`;
 			},
 		},
+		bio: {
+			type: String,
+			default: function () {
+				// Set bio based on role
+				const capitalizedRole =
+					this.role.charAt(0).toUpperCase() + this.role.slice(1);
+				return this.role !== "other"
+					? `${capitalizedRole} at JIET 🎓`
+					: "Proud to be JIETian 🚩";
+			},
+		},
 		email: {
 			type: String,
 			required: true,
