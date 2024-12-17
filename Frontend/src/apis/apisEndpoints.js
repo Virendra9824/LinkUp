@@ -9,6 +9,7 @@ export const authEndpoints = {
   DELETE_ACCOUNT_API_URL: BASE_URL + "/auth/delete-account",
   PASSWORD_RESET_OTP_API_URL: BASE_URL + "/auth/reset-password-otp",
   PASSWORD_RESET_API_URL: BASE_URL + "/auth/reset-password",
+  CHANGE_PASSWORD_API_URL: BASE_URL + "/auth/change-password"
 };
 
 // POST ENDPOINTS
