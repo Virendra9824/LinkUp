@@ -22,8 +22,7 @@ router.get("/logout", isAuth, logoutUser);
 router.delete("/delete-account", isAuth, deleteAccount);
 
 router.post("/reset-password-otp", requestPasswordResetOtp);
-router.post("/reset-password",isAuth, resetPassword);
-router.post("/change-password",isAuth, changePassword);
-
+router.post("/reset-password", resetPassword);
+router.post("/change-password", isAuth, changePassword);
 
 module.exports = router;
