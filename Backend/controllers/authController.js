@@ -10,10 +10,8 @@ const { uploadImageToCloudinary } = require("../utils/imageUploader");
 const generateToken = require("../utils/generateToken");
 const { error } = require("console");
 
-
 const cloudinary = require("cloudinary").v2; // Ensure Cloudinary is required
 
-//sendOTP
 exports.sendOTP = async (req, res) => {
 	try {
 		const { email } = req.body;
@@ -91,7 +89,7 @@ exports.signUp = async (req, res) => {
 		if (checkUserPresent) {
 			return res.status(401).json({
 				success: false,
-				message: "User already registered",
+				message: "User already exists.",
 			});
 		}
 
@@ -99,8 +97,7 @@ exports.signUp = async (req, res) => {
 		if (password !== confirmPassword) {
 			return res.status(400).json({
 				success: false,
-				message:
-					"Password and ConfirmPassword Value do not match, please try again",
+				message: "Password and ConfirmPassword mismatch.",
 			});
 		}
 
@@ -140,12 +137,12 @@ exports.signUp = async (req, res) => {
 
 		if (profilePic) {
 			try {
-				const uploadResponse = await uploadImageToCloudinary(
-					profilePic,
-					"profile_images"
+				const fileUrl = getDataUrl(profilePic);
+				const myCloud = await cloudinary.uploader.upload(
+					fileUrl.content
 				);
-				profileImageUrl = uploadResponse.secure_url; // Cloudinary URL
-				profileImageId = uploadResponse.public_id; // Cloudinary public_id
+				profileImageUrl = myCloud.secure_url; // Cloudinary URL
+				profileImageId = myCloud.public_id; // Cloudinary public_id
 			} catch (error) {
 				return res.status(500).json({
 					success: false,
@@ -248,18 +245,10 @@ exports.login = async (req, res) => {
 	}
 };
 
-
-
-
 // Generate and Send OTP
 exports.requestPasswordResetOtp = async (req, res) => {
-
 	try {
 		const { email } = req.body;
-		
-		
-	   
-		
 
 		// Step 2: Validate if email exists
 		if (!email) {
@@ -268,8 +257,6 @@ exports.requestPasswordResetOtp = async (req, res) => {
 				message: "Email is required",
 			});
 		}
-		
-		
 
 		// Step 3: Generate OTP
 		function generateOtp() {
@@ -277,12 +264,12 @@ exports.requestPasswordResetOtp = async (req, res) => {
 		}
 
 		const otp = generateOtp();
-		console.log("OTP generated: ", otp);
+		// console.log("OTP generated: ", otp);
 
 		// Step 4: Save OTP in the database
 		const otpPayload = { email, otp };
 		const otpBody = await OTP.create(otpPayload);
-		console.log("OTP generated info: ", otpBody);
+		// console.log("OTP generated info: ", otpBody);
 
 		// Step 5: Respond with success message
 		return res.status(200).json({
@@ -298,44 +285,42 @@ exports.requestPasswordResetOtp = async (req, res) => {
 	}
 };
 
-
-
 // Reset Password
 exports.resetPassword = async (req, res) => {
 	try {
 		const { email, otp, password, confirmPassword } = req.body;
-		
 
-        
 		// Validate fields
 		if (!email || !otp || !password || !confirmPassword) {
-			return res.status(400).json({ success: false, message: "All fields are required" });
+			return res
+				.status(400)
+				.json({ success: false, message: "All fields are required" });
 		}
 
 		if (password !== confirmPassword) {
-			return res.status(400).json({ success: false, message: "Passwords do not match" });
+			return res
+				.status(400)
+				.json({ success: false, message: "Passwords do not match" });
 		}
 
 		// Find most recent OTP
 		const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
-		// if (!recentOtp || recentOtp.otp !== otp) {
-		// 	return res.status(400).json({ success: false, message: "Invalid OTP" });
-		// }
 
 		if (Number(otp) !== Number(recentOtp.otp)) {
-			console.log("Received OTP:", otp);
-			console.log("Stored OTP:", recentOtp.otp);
+			// console.log("Received OTP:", otp);
+			// console.log("Stored OTP:", recentOtp.otp);
 			return res.status(400).json({
 				success: false,
 				message: "Invalid OTP",
 			});
 		}
 
-
 		// Check OTP expiry
 		const otpAge = Date.now() - new Date(recentOtp.createdAt).getTime();
 		if (otpAge > 10 * 60 * 1000) {
-			return res.status(400).json({ success: false, message: "OTP has expired" });
+			return res
+				.status(400)
+				.json({ success: false, message: "OTP has expired" });
 		}
 
 		// Hash new password
@@ -344,69 +329,76 @@ exports.resetPassword = async (req, res) => {
 		// Update password
 		const user = await User.findOne({ email });
 		if (!user) {
-			return res.status(404).json({ success: false, message: "User not found" });
+			return res
+				.status(404)
+				.json({ success: false, message: "User not found." });
 		}
 
 		user.password = hashedPassword;
 		await user.save();
 
-		return res.status(200).json({ success: true, message: "Password reset successfully" });
+		return res
+			.status(200)
+			.json({ success: true, message: "Password reset successfully" });
 	} catch (error) {
 		console.error(error);
-		return res.status(500).json({ success: false, message: "Internal server error" });
+		return res.status(500).json({
+			success: false,
+			message: `Error while reset password: ${error.message}`,
+			error: error,
+		});
 	}
 };
 
-
-
 exports.changePassword = async (req, res) => {
 	try {
-	  // Get user data from req.user
-	  const userDetails = await User.findById(req.user.id);
-  
-	  // Get old password, new password, and confirm new password from req.body
-	  const { oldPassword, newPassword } = req.body;
-	  console.log("old password : ", oldPassword);
-	  console.log("new password : ", newPassword);
-  
-	  // Validate old password
-	  const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
-	  console.log(userDetails.password); // Hashed password in the database
-	  console.log("old password ", oldPassword); // Plain-text password entered by user
-  
-	  if (!isPasswordMatch) {
-		// If old password does not match, return a 401 (Unauthorized) error
-		return res.status(401).json({
-		  success: false,
-		  message: "The password is incorrect",
-		});
-	  }
-  
-	  // Update password
-	  const encryptedPassword = await bcrypt.hash(newPassword, 10);
-	  const updatedUserDetails = await User.findByIdAndUpdate(
-		req.user.id,
-		{ password: encryptedPassword },
-		{ new: true }
-	  );
-  
-	  // Return success response
-	  return res.status(200).json({
-		success: true,
-		message: "Password updated successfully",
-	  });
-	} catch (error) {
-	  // If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
-	  console.error("Error occurred while updating password:", error);
-	  return res.status(500).json({
-		success: false,
-		message: "Error occurred while updating password",
-		error: error.message,
-	  });
-	}
-  };
-  
+		// Get user data from req.user
+		const userDetails = await User.findById(req.user.id);
 
+		// Get old password, new password, and confirm new password from req.body
+		const { oldPassword, newPassword } = req.body;
+		console.log("old password : ", oldPassword);
+		console.log("new password : ", newPassword);
+
+		// Validate old password
+		const isPasswordMatch = await bcrypt.compare(
+			oldPassword,
+			userDetails.password
+		);
+		console.log(userDetails.password); // Hashed password in the database
+		console.log("old password ", oldPassword); // Plain-text password entered by user
+
+		if (!isPasswordMatch) {
+			// If old password does not match, return a 401 (Unauthorized) error
+			return res.status(401).json({
+				success: false,
+				message: "The password is incorrect",
+			});
+		}
+
+		// Update password
+		const encryptedPassword = await bcrypt.hash(newPassword, 10);
+		const updatedUserDetails = await User.findByIdAndUpdate(
+			req.user.id,
+			{ password: encryptedPassword },
+			{ new: true }
+		);
+
+		// Return success response
+		return res.status(200).json({
+			success: true,
+			message: "Password updated successfully",
+		});
+	} catch (error) {
+		// If there's an error updating the password, log the error and return a 500 (Internal Server Error) error
+		console.error("Error occurred while updating password:", error);
+		return res.status(500).json({
+			success: false,
+			message: "Error occurred while updating password",
+			error: error.message,
+		});
+	}
+};
 
 exports.logoutUser = async (req, res) => {
 	try {
