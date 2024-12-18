@@ -16,6 +16,9 @@ import UserDetails from "./pages/UserDetails";
 import ShowPost from "./components/posts/ShowPost";
 import UserSpecificPosts from "./components/posts/UserSpecificPosts";
 import Error from "./pages/Error";
+import OpenRoute from "./components/common/OpenRoute";
+import PrivateRoute from "./components/common/PrivateRoute";
+import ForgotPassword from "./components/forms/ForgotPassword";
 
 export default function App() {
   return (
@@ -23,21 +26,111 @@ export default function App() {
       <Header />
       <div className="pt-20 ">
         <Routes>
-          <Route path={"/"} element={<Home />} />
+          <Route
+            path={"/"}
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
 
-          <Route path={"/chat/:receiverId"} element={<Chat />} />
-          <Route path={"/notification"} element={<Notification />} />
-          <Route path={"/update-profile"} element={<UpdateProfile />} />
-          <Route path={"/auth/update-password"} element={<UpdatePassword />} />
-          <Route path={"/auth/delete-account"} element={<DeleteAccount />} />
-          <Route path={"/auth/register"} element={<RegisterUpdateForm />} />
-          <Route path={"/auth/login"} element={<Login />} />
-          <Route path={"/auth/signup"} element={<RegisterUpdateForm />} />
-          <Route path={"/user/:userId"} element={<UserDetails />} />
+          <Route
+            path={"/chat/:receiverId"}
+            element={
+              <PrivateRoute>
+                {" "}
+                <Chat />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={"/notification"}
+            element={
+              <PrivateRoute>
+                {" "}
+                <Notification />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={"/auth/update-password"}
+            element={
+              <PrivateRoute>
+                <UpdatePassword />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path={"/auth/reset-password"} element={<ForgotPassword />} />
+
+          <Route
+            path={"/update-profile"}
+            element={
+              <PrivateRoute>
+                <UpdateProfile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={"/auth/delete-account"}
+            element={
+              <PrivateRoute>
+                {" "}
+                <DeleteAccount />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={"/auth/register"}
+            element={
+              <OpenRoute>
+                <RegisterUpdateForm />
+              </OpenRoute>
+            }
+          />
+
+          <Route
+            path={"/auth/login"}
+            element={
+              <OpenRoute>
+                <Login />
+              </OpenRoute>
+            }
+          />
+
+          <Route
+            path={"/auth/signup"}
+            element={
+              <OpenRoute>
+                <RegisterUpdateForm />
+              </OpenRoute>
+            }
+          />
+
+          <Route
+            path={"/user/:userId"}
+            element={
+              <PrivateRoute>
+                <UserDetails />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path={"/user/:userId/posts/:postId"}
-            element={<UserSpecificPosts />}
+            element={
+              <PrivateRoute>
+                {" "}
+                <UserSpecificPosts />
+              </PrivateRoute>
+            }
           />
+
           <Route path={"*"} element={<Error />} />
         </Routes>
       </div>

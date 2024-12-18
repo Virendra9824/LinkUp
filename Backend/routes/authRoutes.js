@@ -8,6 +8,7 @@ const {
 	signUp,
 	logoutUser,
 	deleteAccount,
+	changePassword,
 } = require("../controllers/authController.js");
 const uploadFile = require("../middlewares/multer");
 const { isAuth } = require("../middlewares/isAuth");
@@ -22,5 +23,6 @@ router.delete("/delete-account", isAuth, deleteAccount);
 
 router.post("/reset-password-otp", requestPasswordResetOtp);
 router.post("/reset-password", resetPassword);
+router.post("/change-password", isAuth, changePassword);
 
 module.exports = router;

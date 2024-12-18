@@ -184,12 +184,59 @@ exports.updateProfile = async (req, res) => {
 			});
 		}
 
-		const { name } = req.body;
+		const { password } = req.body;
 
-		if (name) {
-			user.name = name;
+		// Check if password is provided
+		if (!password) {
+			return res.status(400).json({
+				message: "Password is required.",
+			});
 		}
 
+		// Compare provided password with stored hashed password
+		const isPasswordValid = await bcrypt.compare(password, user.password);
+		if (!isPasswordValid) {
+			return res.status(401).json({
+				message: "Invalid credentials.",
+			});
+		}
+
+		const { userName, firstName, lastName, gender, role, bio } = req.body;
+		// Validate and update the username
+		if (userName) {
+			const existingUser = await User.findOne({
+				userName,
+				_id: { $ne: req.user.id },
+			});
+			if (existingUser) {
+				return res.status(400).json({
+					success: false,
+					message: "Username is already taken.",
+				});
+			}
+			user.userName = userName;
+		}
+
+		if (firstName) {
+			user.firstName = firstName;
+		}
+
+		if (lastName) {
+			user.lastName = lastName;
+		}
+
+		if (gender) {
+			user.gender = gender;
+		}
+
+		if (role) {
+			user.role = role;
+		}
+		if (bio) {
+			user.bio = bio;
+		}
+
+		// Update profilePic
 		const file = req.file;
 		if (file) {
 			const fileUrl = getDataUrl(file);
@@ -210,7 +257,7 @@ exports.updateProfile = async (req, res) => {
 		return res.status(200).json({
 			message: "Profile Updated successfully",
 			success: true,
-			user,
+			updatedUser: user,
 		});
 	} catch (error) {
 		return res.status(500).json({

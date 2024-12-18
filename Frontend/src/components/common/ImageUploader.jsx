@@ -7,7 +7,7 @@ const ImageUploader = ({ setPostImage, thumbnailLink }) => {
 
   useEffect(() => {
     // If thumbnailLink is passed as a prop and is valid, set it as the initial preview
-    if (thumbnailLink) {
+    if (thumbnailLink && !postImage) {
       setPreviewUrl(thumbnailLink);
     }
   }, [thumbnailLink]);

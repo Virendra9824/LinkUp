@@ -9,6 +9,7 @@ const {
   PASSWORD_RESET_OTP_API_URL,
   PASSWORD_RESET_API_URL,
   DELETE_ACCOUNT_API_URL,
+  CHANGE_PASSWORD_API_URL,
 } = authEndpoints;
 
 // Handle common Axios options
@@ -31,7 +32,12 @@ export const sendOTP = async (userData) => {
 
 export const signUp = async (userData) => {
   try {
-    const response = await axios.post(SIGNUP_API_URL, userData, axiosConfig);
+    const response = await axios.post(SIGNUP_API_URL, userData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Error signing up:", error.response?.data || error.message);
@@ -64,6 +70,19 @@ export const logout = async () => {
   }
 };
 
+export const changePassword = async (userData) => {
+  try {
+    const response = await axios.post(
+      CHANGE_PASSWORD_API_URL,
+      userData,
+      axiosConfig
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
 export const requestPasswordResetOtp = async (userData) => {
   try {
     const response = await axios.post(
@@ -73,11 +92,7 @@ export const requestPasswordResetOtp = async (userData) => {
     );
     return response.data;
   } catch (error) {
-    console.error(
-      "Error requesting password reset OTP:",
-      error.response?.data || error.message
-    );
-    throw error;
+    throw error.response?.data || error.message;
   }
 };
 
@@ -90,11 +105,7 @@ export const resetPassword = async (userData) => {
     );
     return response.data;
   } catch (error) {
-    console.error(
-      "Error resetting password:",
-      error.response?.data || error.message
-    );
-    throw error;
+    throw error.response?.data || error.message;
   }
 };
 

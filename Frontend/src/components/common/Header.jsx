@@ -25,6 +25,7 @@ export default function Header() {
   let userName = `${loggedInUser?.firstName || "Logged"} ${
     loggedInUser?.lastName || "Out"
   }`;
+  const { token } = useSelector((state) => state.auth);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -156,7 +157,11 @@ export default function Header() {
               </Link>
 
               {/* User Dropdown in Mobile Menu */}
-              <div className="relative">
+              <div
+                className={`${
+                  !token ? "cursor-not-allowed hidden" : ""
+                }  relative`}
+              >
                 <button
                   onClick={toggleDropdown}
                   className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
@@ -175,7 +180,9 @@ export default function Header() {
 
                 {/* Dropdown menu for mobile */}
                 {isDropdownOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div
+                    className={`origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[rgb(51,51,51)] ring-1 ring-black ring-opacity-5 focus:outline-none`}
+                  >
                     <div className="py-1">
                       <Link
                         to={`/user/${userId}`}
@@ -183,7 +190,7 @@ export default function Header() {
                       >
                         MyProfile
                       </Link>
-                      <Link
+                      {/* <Link
                         to="auth/login"
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                       >
@@ -194,7 +201,7 @@ export default function Header() {
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                       >
                         SignUp
-                      </Link>
+                      </Link> */}
                       <Link
                         to="update-profile"
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
@@ -208,7 +215,7 @@ export default function Header() {
                         Log Out
                       </Link>
                       <Link
-                        to="update-password"
+                        to="/auth/update-password"
                         className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                       >
                         Update Password
@@ -249,7 +256,11 @@ export default function Header() {
           </Link>
 
           {/* User Dropdown */}
-          <div className="relative inline-block text-left">
+          <div
+            className={`${
+              !token ? "cursor-not-allowed hidden" : ""
+            }  relative inline-block text-left`}
+          >
             <button
               onClick={toggleDropdown}
               className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-[rgb(51,51,51)] text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
@@ -276,7 +287,7 @@ export default function Header() {
                   >
                     MyProfile
                   </Link>
-                  <Link
+                  {/* <Link
                     to="auth/login"
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
@@ -287,7 +298,7 @@ export default function Header() {
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
                     SignUp
-                  </Link>
+                  </Link> */}
                   <Link
                     to="update-profile"
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
@@ -295,7 +306,7 @@ export default function Header() {
                     Update Profile
                   </Link>
                   <Link
-                    to="update-password"
+                    to="/auth/update-password"
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
                     Update Password
