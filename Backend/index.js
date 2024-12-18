@@ -10,6 +10,11 @@ const { cloudinaryConnect } = require("./config/cloudinaryConfig.js");
 
 const http = require("http");
 const { Server } = require("socket.io");
+// import {Server} from "socket.io";
+// import { socketHandler } from "./socket/socketHandler.js";
+const socketHandler = require("./socket/socketHandler.js")
+
+
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -28,38 +33,24 @@ const io = new Server(server, {
 	},
   });
   
-  // Handle WebSocket connections
-  io.on("connection", (socket) => {
-	console.log("A user connected:", socket.id);
+connectDB();
+
+// Apply Socket.IO handler
+
   
-	// Listen for messages and forward them to the receiver
-	socket.on("send_message", (data) => {
-	  console.log("Message received:", data);
-	  io.to(data.receiverId).emit("receive_message", data); // Send message to receiver
-	});
-  
-	// Join a room for chat
-	socket.on("join_room", (roomId) => {
-	  socket.join(roomId);
-	  console.log(`User with ID ${socket.id} joined room: ${roomId}`);
-	});
-  
-	// Handle disconnect
-	socket.on("disconnect", () => {
-	  console.log("User disconnected:", socket.id);
-	});
-  });
-  
+socketHandler(io);
 
 const corsOptions = {
 	origin: FRONTEND_URL,
 	credentials: true,
 };
 
+
+
 // Use the CORS middleware
 app.use(cors(corsOptions));
 
-connectDB();
+
 
 cloudinaryConnect();
 
@@ -75,7 +66,7 @@ app.use("/api/post", postRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/chat", messageRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 	console.log("Jai Shree RAM🚩");
 	console.log("App is listening on port: ", PORT);
 });
