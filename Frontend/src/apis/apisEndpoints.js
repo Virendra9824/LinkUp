@@ -28,3 +28,18 @@ export const userEndpoints = {
   GET_USER_BY_ID: BASE_URL + "/user",
   FOLLOW_UNFOLLOW_USER_API_URL: BASE_URL + "/user/follow",
 };
+
+
+// // USER ENDPOINTS
+// export const userEndpoints = {
+//   GET_FOLLOWINGS_API_URL: BASE_URL + "/user/followings",
+// };
+
+
+// CHAT ENDPOINTS
+
+export const chatEndpoints = {
+  CREATE_MESSAGE_API_URL: BASE_URL + "/chat",
+  GET_ALL_CHAT_URL:BASE_URL + "/chat/chats",
+  GET_ALL_MESSAGES_URL: BASE_URL +"/chat/:id",
+};
