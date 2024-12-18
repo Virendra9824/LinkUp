@@ -6,7 +6,7 @@ const getDataUrl = require("../utils/uriGenerator.js");
 const cloudinary = require("cloudinary");
 const { getReceiverSocketId } = require("../socket/socketHandler.js");
 // import { getReceiverSocketId } from "../socket/socketHandler.js";
-const { io } = require("../socket/socket.js");
+// const { io } = require("../socket/socket.js");
 
 // Send message
 exports.sendMessage = async (req, res) => {
