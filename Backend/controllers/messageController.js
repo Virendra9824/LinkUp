@@ -4,6 +4,9 @@ const Message = require("../models/messageSchema.js");
 const Post = require("../models/postSchema.js");
 const getDataUrl = require("../utils/uriGenerator.js");
 const cloudinary = require("cloudinary");
+const { getReceiverSocketId } = require("../socket/socketHandler.js");
+// import { getReceiverSocketId } from "../socket/socketHandler.js";
+const { io } = require("../socket/socket.js");
 
 // Send message
 exports.sendMessage = async (req, res) => {
@@ -11,7 +14,7 @@ exports.sendMessage = async (req, res) => {
 		const senderId = req.user.id;
 		const { receiverId, message } = req.body;
 
-		if (!senderId || !receiverId || !message) {
+		if (!receiverId || !message ) {
 			return res.status(400).json({
 				message: "All fields are required!",
 			});
@@ -38,6 +41,7 @@ exports.sendMessage = async (req, res) => {
 			content: message,
 			sender: senderId,
 		});
+		// console.log("newmessage:",newMessage)
 
 		await newMessage.save();
 
@@ -47,7 +51,12 @@ exports.sendMessage = async (req, res) => {
 		});
 		await chat.save();
 
-		return res.status(200).json({
+		// return res.status(200).json({
+		// 	message: "Message created successfully",
+		// 	success: true,
+		// 	newMessage,
+		// });
+		res.status(200).json({
 			message: "Message created successfully",
 			success: true,
 			newMessage,
@@ -73,7 +82,7 @@ exports.getAllMessages = async (req, res) => {
 
 		if (!chat) {
 			return res.status(404).json({
-				message: "Chat not found!",
+				message: "No chat with this user found!",
 			});
 		}
 

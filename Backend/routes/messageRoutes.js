@@ -11,7 +11,7 @@ const router = express.Router();
 
 // router.post("/new", isAuth, uploadFile, createPost);
 router.post("/", isAuth, sendMessage);
-router.get("/", isAuth, getAllChats);
+router.get("/chats", isAuth, getAllChats);
 router.get("/:id", isAuth, getAllMessages);
 
 module.exports = router;

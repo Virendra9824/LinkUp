@@ -13,7 +13,8 @@ const messageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    text: String,
+    
+    content : String,
   },
   { timestamps: true }
 );
