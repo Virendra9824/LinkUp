@@ -1,6 +1,6 @@
 import React from "react";
 import { IoPersonAddOutline } from "react-icons/io5";
-export default function SingleUser() {
+export default function SingleUser({ firstName, lastName, role }) {
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -11,8 +11,10 @@ export default function SingleUser() {
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <p className="font-medium">Vaibhav Sachdeva</p>
-            <p className="text-sm text-gray-400">Software Developer</p>
+            <p className="font-medium">
+              {firstName} {lastName}{" "}
+            </p>
+            <p className="text-sm text-gray-400">{role}</p>
           </div>
         </div>
         <button className=" p-4 rounded-full">

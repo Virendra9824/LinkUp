@@ -35,7 +35,7 @@ export default function UserDetails() {
   }, [userId, loggedInUser, isLoggedInUser]);
 
   return (
-    <div className="w-[100%] lg:w-[65%] mx-auto space-y-8 border-4 border-emerald-600 min-h-screen">
+    <div className="w-[100%] lg:w-[65%] mx-auto space-y-8  min-h-screen">
       {/* User-Info */}
       {loading ? (
         <div className="flex justify-center">

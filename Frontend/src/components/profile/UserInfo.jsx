@@ -24,7 +24,7 @@ export default function UserInfo({ user, isLoggedInUser }) {
     }
   };
   return (
-    <div className="flex flex-col sm:flex-row w-[90%] mx-auto border-2 border-red-700 items-center text-white p-6 space-y-4 sm:space-y-0 sm:space-x-4 rounded-lg">
+    <div className="flex flex-col sm:flex-row w-[90%] mx-auto  items-center text-white p-6 space-y-4 sm:space-y-0 sm:space-x-4 rounded-lg">
       {/* Profile Picture */}
       <div className="relative w-24 h-24 sm:w-36 sm:h-36 mx-auto sm:mx-0">
         <img
