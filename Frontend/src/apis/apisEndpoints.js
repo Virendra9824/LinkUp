@@ -19,7 +19,7 @@ export const postEndpoints = {
   COMMENT_ON_POST_API_URL: BASE_URL + "/post/comment/:id",
   DELETE_COMMENT_API_URL: BASE_URL + "/post/comment/delete/:id",
   DELETE_POST_API_URL: BASE_URL + "/post/:id",
-  UPDATE_POST_API_URL: BASE_URL + "/post/update/:id",
+  UPDATE_POST_API_URL: BASE_URL + "/post/update/",
   GET_ALL_POSTS_API_URL: BASE_URL + "/post/all",
 };
 
@@ -31,17 +31,15 @@ export const userEndpoints = {
   UPDATE_PROFILE_API_URL: BASE_URL + "/user/updateprofile",
 };
 
-
 // // USER ENDPOINTS
 // export const userEndpoints = {
 //   GET_FOLLOWINGS_API_URL: BASE_URL + "/user/followings",
 // };
 
-
 // CHAT ENDPOINTS
 
 export const chatEndpoints = {
   CREATE_MESSAGE_API_URL: BASE_URL + "/chat",
-  GET_ALL_CHAT_URL:BASE_URL + "/chat/chats",
-  GET_ALL_MESSAGES_URL: BASE_URL +"/chat/:id",
+  GET_ALL_CHAT_URL: BASE_URL + "/chat/chats",
+  GET_ALL_MESSAGES_URL: BASE_URL + "/chat/:id",
 };
