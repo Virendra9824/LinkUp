@@ -9,23 +9,32 @@ import {
   deletePost,
   getAllPosts,
   likeUnlikePost,
+  updatePost,
 } from "../../apis/postApi";
 import EmojiPicker from "emoji-picker-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useRef } from "react";
 import toast from "react-hot-toast";
 import { followUnfollowReqest } from "../../apis/userApi";
+import {
+  deletePostFromPosts,
+  likeUnlikePostRedux,
+  setPosts,
+  updateCaptionFromPosts,
+  updateComment,
+  updateFollowers,
+  updateIsFriend,
+} from "../../redux/slices/postSlice";
+import { updateFollowings } from "../../redux/slices/profileSlice";
 
 export default function ShowPost({ userPosts, postIndex }) {
   const profilePicLink =
     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
-  const [addFriend, setAddFriend] = useState(true);
   const [countryName] = useState("India");
   const [profilePic] = useState(profilePicLink);
   const [postImage] = useState(profilePicLink);
-  // const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
   const [commentLoading, setCommentLoading] = useState(false);
@@ -40,6 +49,10 @@ export default function ShowPost({ userPosts, postIndex }) {
   const loggedInUser = useSelector((state) => state.profile.user);
   const currentUserId = loggedInUser?._id;
 
+  const { userId } = useParams();
+
+  const dispatch = useDispatch();
+
   const onEmojiClick = (emojiData) => {
     setCommentValue((prevInput) => prevInput + emojiData.emoji);
   };
@@ -51,42 +64,92 @@ export default function ShowPost({ userPosts, postIndex }) {
     }));
   };
 
+  // **************************
+  //  **** FETCH POSTS start ****
+  const { posts: postsFromRedux } = useSelector((state) => state.post);
+
+  // Fetch all posts from the backend
   const fetchAllPosts = async () => {
     setLoading(true);
     try {
       const data = await getAllPosts();
-      console.log("Posts Fetched Successfully: ", data);
       const updatedPosts = data.allPosts.map((post) => ({
         ...post,
         isLiked: post.likes.includes(currentUserId),
-        isFriend: post.owner?.followers?.includes(currentUserId) || false,
+        likesCount: post.likes.length,
+        isFriend: loggedInUser?.followings?.includes(post.owner?._id) || false,
       }));
       setAllPosts(updatedPosts);
+      dispatch(setPosts(updatedPosts));
     } catch (error) {
-      console.log("Error while fetching posts: ", error);
+      console.error("Error while fetching posts:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  //  **** FETCH POSTS ****
+  // Fetch posts on initial mount
   useEffect(() => {
-    if (!userPosts) {
-      fetchAllPosts();
-    } else {
-      const updatedPosts = userPosts.map((post) => ({
-        ...post,
-        isLiked: post.likes.includes(currentUserId),
-        isFriend: post.owner?.followers?.includes(currentUserId) || false,
-      }));
-      setAllPosts(updatedPosts);
-    }
+    fetchAllPosts();
   }, []);
+
+  // Prepare the posts to render
+  const filteredPosts = userId
+    ? postsFromRedux.filter((post) => post.owner._id === userId)
+    : postsFromRedux;
+
+  // const postsToRender = filteredPosts.map((post) => ({
+  //   ...post,
+  //   isLiked: post.likes.includes(currentUserId),
+  //   likesCount: post.likes.length,
+  // }));
+
+  const postsToRender = filteredPosts;
+
+  // **************************
+  //  **** FETCH POSTS end ****
+
+  const handleAddFriend = async (isFriend, userId, userName) => {
+    // setLoading(true);
+    try {
+      const response = await followUnfollowReqest(userId);
+      const { updatedUserFollowings, targetUserFollowers } = response;
+
+      toast.success(`${userName} ${response?.result}`);
+      // console.log("Response of follow/Unfollow-Request: ", response);
+
+      // Update isFriend status in posts
+      dispatch(
+        updateIsFriend({
+          userId,
+          isFriend: response?.result === "Followed" ? true : false,
+        })
+      );
+
+      isFriend = response?.result === "Followed" ? true : false;
+
+      // Update Followers of target user.
+      dispatch(updateFollowers({ userId, targetUserFollowers, isFriend }));
+
+      // Update logged-in user's followings
+      dispatch(updateFollowings(updatedUserFollowings));
+    } catch (error) {
+      console.log("Error while Follow/UnFollow: ", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateComment = async (postId) => {
     try {
       setCommentLoading(true);
-      await commentOnPost({ comment: commentValue, postId });
+
+      const response = await commentOnPost({ comment: commentValue, postId });
+      const updatedComment = response?.newComment;
+
+      dispatch(updateComment({ postId, updatedComment }));
+      // console.log("postsFromRedux After comment: ", postsFromRedux);
     } catch (error) {
       console.log("Error while creating comment: ", error);
     } finally {
@@ -112,12 +175,17 @@ export default function ShowPost({ userPosts, postIndex }) {
   const handleLikeUnlike = async (postId) => {
     try {
       setLikeLoading(true);
-      await likeUnlikePost({ postId });
-      // setIsLiked(!isLiked);
-      setAllPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post._id === postId ? { ...post, isLiked: !post.isLiked } : post
-        )
+      const response = await likeUnlikePost({ postId });
+
+      // console.log("Response of likeUnlike: ", response);
+
+      dispatch(
+        likeUnlikePostRedux({
+          postId: response.postId,
+          likesCount: response.likesCount,
+          isLiked: response.isLiked,
+          likes: response.likes,
+        })
       );
     } catch (error) {
       console.log("Error while LikeUnlike: ", error);
@@ -130,6 +198,7 @@ export default function ShowPost({ userPosts, postIndex }) {
     try {
       setLoading(true);
       const response = await deletePost({ postId });
+      dispatch(deletePostFromPosts({ postId }));
       console.log(response.message);
     } catch (error) {
       console.log("Error while Deleting post: ", error);
@@ -156,20 +225,7 @@ export default function ShowPost({ userPosts, postIndex }) {
       });
   };
 
-  const handleAddFriend = async (isFriend, userId, userName) => {
-    setLoading(true);
-    try {
-      const response = await followUnfollowReqest(userId);
-      toast.success(`${userName} ${isFriend ? "Unfollowed" : "Followed"}`);
-    } catch (error) {
-      console.log("Error while Follow/UnFollow: ", error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // To scroll to a specified index or position.
+  // To SCROLL to a specified index or position.
   const postRefs = useRef([]);
   useEffect(() => {
     if (
@@ -182,8 +238,41 @@ export default function ShowPost({ userPosts, postIndex }) {
     }
   }, [postIndex, allPosts]);
 
+  // ****** UPDATE CAPTION start ******:
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [updatedCaption, setUpdatedCaption] = useState("");
+  const [captionPostId, setCaptionPostId] = useState("");
+
+  const handleUpdateCaptionApi = async () => {
+    try {
+      if (!updatedCaption) throw new Error("Caption is required!");
+      const response = await updatePost({
+        postId: captionPostId,
+        caption: updatedCaption,
+      });
+      toast.success("Caption updated successfully!");
+      dispatch(
+        updateCaptionFromPosts({ postId: captionPostId, updatedCaption })
+      );
+      setUpdatedCaption("");
+    } catch (error) {
+      toast.error("Error updating caption");
+      console.log("Error while updating caption: ", error);
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleUpdateCaption = async (postId, currentCaption) => {
+    setCaptionPostId(postId);
+    setUpdatedCaption(currentCaption);
+    setIsModalOpen(!isModalOpen);
+  };
+
+  // ****** UPDATE CAPTION End******
+
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col space-y-6 min-h-screen">
       {loading && (
         <div className="flex justify-center">
           <div className="spinner-sm"></div>
@@ -191,7 +280,7 @@ export default function ShowPost({ userPosts, postIndex }) {
       )}
 
       {!loading &&
-        allPosts?.map((post, index) => (
+        postsToRender?.map((post, index) => (
           <div
             key={post._id}
             ref={(el) => (postRefs.current[index] = el)}
@@ -215,7 +304,7 @@ export default function ShowPost({ userPosts, postIndex }) {
                   <h6 className="text-sm text-gray-500">{countryName}</h6>
                 </div>
               </div>
-              {/* Follow-Unfollow Btn */}
+              {/* Follow - Unfollow Btn */}
               <button
                 disabled={loading}
                 onClick={() =>
@@ -244,18 +333,21 @@ export default function ShowPost({ userPosts, postIndex }) {
                   onClick={() => toggleOptions(post._id)}
                 />
                 {optionsVisibility[post._id] && (
-                  <div className="absolute bg-gray-700 text-gray-100 shadow-lg rounded-md mt-2 py-2 w-40 right-0">
+                  <div className="absolute px-2 bg-[rgba(10,10,10,0.8)] text-gray-200 shadow-lg rounded-md mt-2 py-2 w-40 right-0">
                     <button
-                      onClick={() => console.log("Update post", post._id)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-600"
+                      onClick={() => {
+                        setCaptionPostId(post._id);
+                        handleUpdateCaption(post._id, post.caption);
+                      }}
+                      className="block px-1 rounded-t-sm py-2 border-b text-sm hover:bg-gray-600 w-full text-left"
                     >
                       Update Caption
                     </button>
                     <button
                       onClick={() => handleDelete(post._id)}
-                      className="block px-4 py-2 text-sm hover:bg-gray-600"
+                      className="block px-1 rounded-b-sm py-2 text-sm hover:bg-gray-600 w-full text-left"
                     >
-                      Delete
+                      Delete Post
                     </button>
                   </div>
                 )}
@@ -286,7 +378,7 @@ export default function ShowPost({ userPosts, postIndex }) {
                   ) : (
                     <IoIosHeartEmpty size={20} className="text-white" />
                   )}{" "}
-                  {post.likes.length || 0}
+                  {post.likesCount || 0}
                 </div>
                 <div
                   onClick={() => handleToggleComments(post._id)}
@@ -382,6 +474,46 @@ export default function ShowPost({ userPosts, postIndex }) {
             )}
           </div>
         ))}
+
+      {/* Update-Caption Modal */}
+      {isModalOpen && (
+        <>
+          {/* Modal */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="bg-[#1A1A1A] p-4 sm:p-6 rounded-lg shadow-lg w-11/12 sm:w-96">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">
+                Edit Caption
+              </h2>
+              <textarea
+                value={updatedCaption}
+                onChange={(e) => setUpdatedCaption(e.target.value)}
+                rows="3"
+                className="w-full p-3 border border-gray-600 rounded bg-[#2A2A2A] text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div className="flex justify-end space-x-4 mt-4">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateCaptionApi}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsModalOpen(false)}
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          ></div>
+        </>
+      )}
     </div>
   );
 }
