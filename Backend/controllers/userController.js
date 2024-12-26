@@ -69,21 +69,23 @@ exports.userProfile = async (req, res) => {
 exports.followAndUnfollowUser = async (req, res) => {
 	try {
 		const user = await User.findById(req.params.userId).select("-password");
-
 		const loggedInUser = await User.findById(req.user.id).select(
 			"-password"
 		);
 
 		if (!user) {
 			return res.status(404).json({
-				message: "User not found with given id",
+				message: "User not found with given ID",
+				success: false,
 			});
 		}
 
-		if (user._id.toString() === loggedInUser._id.toString())
+		if (user._id.toString() === loggedInUser._id.toString()) {
 			return res.status(400).json({
 				message: "You cannot follow or unfollow yourself",
+				success: false,
 			});
+		}
 
 		// Unfollow user
 		if (user.followers.includes(loggedInUser._id)) {
@@ -100,8 +102,11 @@ exports.followAndUnfollowUser = async (req, res) => {
 			await loggedInUser.save();
 
 			return res.status(200).json({
-				message: "User unfollowed successfully",
+				message: `${user?.firstName} unFollowed successfully`,
+				result: "UnFollowed",
 				success: true,
+				updatedUserFollowings: loggedInUser.followings,
+				targetUserFollowers: user.followers,
 			});
 		}
 
@@ -109,17 +114,22 @@ exports.followAndUnfollowUser = async (req, res) => {
 		else {
 			user.followers.push(loggedInUser._id);
 			loggedInUser.followings.push(user._id);
+
 			await user.save();
 			await loggedInUser.save();
+
 			return res.status(200).json({
-				message: "User followed successfully",
+				message: `${user?.firstName} Followed successfully`,
+				result: "Followed",
 				success: true,
+				updatedUserFollowings: loggedInUser.followings,
+				targetUserFollowers: user.followers,
 			});
 		}
 	} catch (error) {
 		return res.status(500).json({
 			error: error,
-			message: "Error in Follow/Unfollow user as: " + error.message,
+			message: "Error in Follow/Unfollow user: " + error.message,
 			success: false,
 		});
 	}
@@ -176,7 +186,8 @@ exports.followingsData = async (req, res) => {
 // UpdateProfile
 exports.updateProfile = async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id);
+		const userId = req.user.id;
+		const user = await User.findById(userId);
 
 		if (!user) {
 			return res.status(404).json({
@@ -254,10 +265,29 @@ exports.updateProfile = async (req, res) => {
 
 		await user.save();
 
+		const updatedUser = await User.findById(userId)
+			.select("-password") // Exclude the password field from the User document
+			.populate({
+				path: "posts", // Populate the 'posts' field in the User document
+				populate: [
+					{
+						path: "owner", // Populate the 'owner' field inside each post
+						select: "-password", // Exclude the password field from the owner
+					},
+					{
+						path: "comments", // Populate the 'comments' field inside each post
+						populate: {
+							path: "user", // Optionally populate the 'user' field inside each comment
+							select: "-password", // Fetch only specific fields from the user (like name and email)
+						},
+					},
+				],
+			});
+
 		return res.status(200).json({
 			message: "Profile Updated successfully",
 			success: true,
-			updatedUser: user,
+			updatedUser,
 		});
 	} catch (error) {
 		return res.status(500).json({
