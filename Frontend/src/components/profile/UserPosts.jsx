@@ -1,13 +1,24 @@
 import { FcLike } from "react-icons/fc";
 import { FaComment } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
-const UserPosts = ({ posts }) => {
+const UserPosts = () => {
+  let { userId } = useParams();
+
+  const { posts } = useSelector((state) => state.post);
+  const [userPosts, setUserPosts] = useState([]);
+  useEffect(() => {
+    setUserPosts(posts.filter((post) => post.owner._id == userId));
+  }, [userId]);
+
   return (
     <div className="grid grid-cols-3 gap-1">
-      {posts.map((post, index) => (
+      {userPosts.map((post, index) => (
         <Link
           to={`posts/${post._id}?index=${index + 1}`}
+          // INDEX in reverse order -> index=${userPosts.length - index}
           key={index}
           className="relative group aspect-square w-full"
         >

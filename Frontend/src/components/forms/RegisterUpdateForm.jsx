@@ -6,8 +6,9 @@ import ImageUploader from "../common/ImageUploader";
 import toast from "react-hot-toast";
 import { sendOTP } from "../../apis/authApi";
 import { signUp } from "../../apis/authApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateProfile } from "../../apis/userApi";
+import { setUser } from "../../redux/slices/profileSlice";
 
 export default function RegisterUpdateForm(props) {
   const { isUpdateForm } = props;
@@ -36,6 +37,7 @@ export default function RegisterUpdateForm(props) {
   const [sendOtpBtnMessage, setSendOtpBtnMessage] = useState("Send OTP");
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState(null);
+  const dispatch = useDispatch();
 
   // Validate the userName.
   let isValidUsername = (username) => {
@@ -144,7 +146,7 @@ export default function RegisterUpdateForm(props) {
       formDataToSend.append(key, formData[key]);
     });
 
-    // New User Register Form
+    // NEW USER REGISTRATION FORM
     if (!isUpdateForm && validateForm()) {
       if (profilePic) formDataToSend.append("file", profilePic);
 
@@ -179,7 +181,7 @@ export default function RegisterUpdateForm(props) {
       }
     }
 
-    // Update profile Form
+    // UPDATE PROFILE FORM
     if (isUpdateForm && validateForm()) {
       if (profilePic) formDataToSend.append("file", profilePic);
 
@@ -203,6 +205,8 @@ export default function RegisterUpdateForm(props) {
         setLoading(true);
         const response = await updateProfile(formDataToSend);
         console.log("Response of updateProfile form: ", response);
+
+        dispatch(setUser(response.updatedUser));
 
         if (response?.success) {
           toast.success("Profile updated successfully");
@@ -262,10 +266,12 @@ export default function RegisterUpdateForm(props) {
     if (isUpdateForm) {
       setInitialUserData();
     }
+
+    window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="bg-[#1A1A1A] w-11/12 xs:w-[95%] sm:w-[80%] md:w-[50%] p-3 sm:p-4 md:p-7 mx-auto flex flex-col justify-between gap-4 rounded-xl">
+    <div className="bg-[#1A1A1A] w-11/12 xs:w-[95%] sm:w-[80%] md:w-[50%] p-3 sm:p-4 md:p-7 mx-auto flex flex-col justify-between gap-4 rounded-xl my-2">
       <h1 className="text-white font-bold text-xl">
         Welcome to LinkUp,{" "}
         {isUpdateForm
