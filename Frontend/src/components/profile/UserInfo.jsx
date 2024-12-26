@@ -3,19 +3,40 @@ import toast from "react-hot-toast";
 import { BsThreeDots } from "react-icons/bs";
 import { RiSettings3Line } from "react-icons/ri";
 import { followUnfollowReqest } from "../../apis/userApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { updateFollowers, updateIsFriend } from "../../redux/slices/postSlice";
+import { updateFollowings } from "../../redux/slices/profileSlice";
 
 export default function UserInfo({ user, isLoggedInUser }) {
   const [loading, setLoading] = useState(false);
   const loggedInUser = useSelector((state) => state.profile.user);
-  const isFriend = user.followers.includes(loggedInUser?._id);
+  let isFriend = user.followers.includes(loggedInUser?._id);
+
+  const dispatch = useDispatch();
 
   const handleAddFriend = async (userId, userName) => {
     setLoading(true);
     try {
       const response = await followUnfollowReqest(userId);
-      toast.success(`${userName} ${isFriend ? "Unfollowed" : "Followed"}`);
+      const { updatedUserFollowings, targetUserFollowers } = response;
+      toast.success(`${userName} ${response?.result}`);
+
+      isFriend = response?.result === "Followed" ? true : false;
+
+      // Update isFriend status in posts
+      dispatch(
+        updateIsFriend({
+          userId,
+          isFriend: response?.result === "Followed" ? true : false,
+        })
+      );
+
+      // Update Followers of target user.
+      dispatch(updateFollowers({ userId, targetUserFollowers, isFriend }));
+
+      // Update logged-in user's followings
+      dispatch(updateFollowings(updatedUserFollowings));
     } catch (error) {
       console.log("Error while Follow/UnFollow: ", error);
       toast.error(error.message);
@@ -23,6 +44,7 @@ export default function UserInfo({ user, isLoggedInUser }) {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex flex-col sm:flex-row w-[90%] mx-auto  items-center text-white p-6 space-y-4 sm:space-y-0 sm:space-x-4 rounded-lg">
       {/* Profile Picture */}
@@ -84,15 +106,15 @@ export default function UserInfo({ user, isLoggedInUser }) {
         {/* Stats Section */}
         <div className="flex justify-center sm:justify-start gap-x-8 w-full text-center text-sm">
           <div className="flex gap-x-1">
-            <h2 className="font-bold">{user.posts.length}</h2>
+            <h2 className="font-bold">{user?.posts?.length || 0}</h2>
             <span className="text-gray-400">posts</span>
           </div>
           <div className="flex gap-x-1">
-            <h2 className="font-bold">{user.followers.length}</h2>
+            <h2 className="font-bold">{user?.followers?.length || 0}</h2>
             <span className="text-gray-400">followers</span>
           </div>
           <div className="flex gap-x-1">
-            <h2 className="font-bold">{user.followings.length}</h2>
+            <h2 className="font-bold">{user?.followings?.length || 0}</h2>
             <span className="text-gray-400">following</span>
           </div>
         </div>
