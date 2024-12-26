@@ -19,6 +19,7 @@ import Error from "./pages/Error";
 import OpenRoute from "./components/common/OpenRoute";
 import PrivateRoute from "./components/common/PrivateRoute";
 import ForgotPassword from "./components/forms/ForgotPassword";
+import AboutUs from "./pages/AboutUs";
 
 export default function App() {
   return (
@@ -65,6 +66,8 @@ export default function App() {
           />
 
           <Route path={"/auth/reset-password"} element={<ForgotPassword />} />
+
+          <Route path={"/about"} element={<AboutUs />} />
 
           <Route
             path={"/update-profile"}
