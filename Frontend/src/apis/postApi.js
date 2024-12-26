@@ -1,18 +1,6 @@
 import axios from "axios";
 import { postEndpoints } from "./apisEndpoints.js";
 
-/*
-**** Verified Endpoints with Frontend ****
-  showAllPosts,
-  commentOnPost -> Show TimeStamps,
-  deleteComment,
-  likeUnlike,
-  createPost -> How to add only TEXT-MESSAGE only, instead of Image or Canva Type;
-  updatePost -> How to update using UI,
-  deletePost,
-
-*/
-
 const {
   CREATE_POST_API_URL,
   LIKE_UNLIKE_POST_API_URL,
