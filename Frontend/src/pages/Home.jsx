@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CreatePost from "../components/posts/CreatePost";
 import ShowPost from "../components/posts/ShowPost";
 import UserDetails from "../components/home/UserDetails";
 import UserSuggested from "../components/home/UserSuggested";
 
 export default function Home() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="w-[90%] lg:pb-5 pb-3 lg:pt-4 pt-4  mx-auto flex lg:flex-row flex-col justify-between gap-8 min-h-screen">
       {/* RIGHT-section (Sticky on Large Screens) */}
