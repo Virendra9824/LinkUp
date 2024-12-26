@@ -16,7 +16,7 @@ const router = express.Router();
 router.post("/new", isAuth, uploadFile, createPost);
 router.post("/:id", isAuth, deletePost);
 router.get("/all", isAuth, getAllPosts);
-router.put("/update/:id", isAuth, updatePost);
+router.put("/update/", isAuth, updatePost);
 router.post("/like/:id", isAuth, likeUnlikePost);
 router.post("/comment/:id", isAuth, commentOnPost);
 router.post("/comment/delete/:id", isAuth, deleteComment);
