@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdMoon, IoIosNotifications } from "react-icons/io";
 import { PiQuestionMarkFill } from "react-icons/pi";
@@ -77,6 +77,10 @@ export default function Header() {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="bg-[rgb(26,26,26)] z-[1000] w-full fixed">
       <header className="md:w-[90%] w-[100%] px-4 md:px-0 text-white m-auto py-5 flex justify-between items-center relative">
@@ -84,9 +88,10 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           <Link
             to="/"
+            onClick={() => window.scrollTo(0, 0)}
             className="text-2xl md:text-3xl font-bold text-cyan-500 whitespace-nowrap"
           >
-            Link-Up
+            LinkUp
           </Link>
         </div>
 
@@ -131,10 +136,7 @@ export default function Header() {
           <div className="absolute top-full left-0 w-full bg-gray-800 z-10 md:hidden">
             <div className="flex flex-col items-center space-y-4 p-4">
               {/* Icons for Mobile Menu */}
-              <Link
-                to="testPage"
-                className="text-xl text-white hover:text-cyan-500"
-              >
+              <Link to="/" className="text-xl text-white hover:text-cyan-500">
                 <IoMdMoon />
               </Link>
               <Link
@@ -150,7 +152,7 @@ export default function Header() {
                 <IoIosNotifications />
               </Link>
               <Link
-                to="testPage"
+                to="/about"
                 className="text-xl text-white hover:text-cyan-500"
               >
                 <PiQuestionMarkFill />
@@ -242,7 +244,7 @@ export default function Header() {
 
         {/* Icons and User Section for Desktop */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="testPage" className="text-xl cursor-pointer">
+          <Link to="/" className="text-xl cursor-pointer hover:text-cyan-500">
             <IoMdMoon />
           </Link>
           <Link to="/chat/me" className="text-xl cursor-pointer">
@@ -251,7 +253,7 @@ export default function Header() {
           <Link to="notification" className="text-xl cursor-pointer">
             <IoIosNotifications />
           </Link>
-          <Link to="testPage" className="text-xl cursor-pointer">
+          <Link to="/about" className="text-xl cursor-pointer">
             <PiQuestionMarkFill />
           </Link>
 
