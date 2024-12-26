@@ -3,6 +3,8 @@ import { MdOutlineDelete } from "react-icons/md";
 import { deleteComment } from "../../apis/postApi";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { deleteCommentFromPosts } from "../../redux/slices/postSlice";
 
 export default function CommentCard(props) {
   let {
@@ -17,14 +19,14 @@ export default function CommentCard(props) {
     postOwnerId,
   } = props;
   const [deleteCommentLoading, setDeleteCommentLoading] = useState(false);
+  const dispatch = useDispatch();
 
   let handleDeleteComment = async (postId) => {
     try {
       setDeleteCommentLoading(true);
       const response = await deleteComment({ postId, commentId });
-      console.log(response.message);
+      dispatch(deleteCommentFromPosts({ postId, commentId }));
       toast.success(response.message);
-      // Refresh the comments after deletion
     } catch (error) {
       console.error("Error deleting comment:", error);
       toast.error("Error in deleting comment.");
