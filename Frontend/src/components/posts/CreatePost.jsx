@@ -5,8 +5,10 @@ import { BsThreeDots } from "react-icons/bs";
 import ImageUploader from "../common/ImageUploader";
 import { createPost } from "../../apis/postApi";
 import EmojiPicker from "emoji-picker-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { addNewPost } from "../../redux/slices/postSlice";
+import { setNewPostToUser } from "../../redux/slices/profileSlice";
 
 export default function CreatePost() {
   const [showImageArea, setShowImageArea] = useState(false); // STATE FOR IMAGE AREA
@@ -23,22 +25,11 @@ export default function CreatePost() {
     setPostCaption((prevInput) => prevInput + emojiData.emoji);
   };
 
-  const fetchCurrentUserDetails = () => {
-    try {
-      setLoading(true);
-      // const response = await getCurrentUserDetails();
-      // console.log("User details fetched successfully: ", response);
-    } catch (error) {
-      console.log("Error while fetching user details: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // FUNCTION TO TOGGLE IMAGE AREA
   const handleImageButtonClick = () => {
     setShowImageArea(!showImageArea);
   };
+  const dispatch = useDispatch();
 
   const handleCreatePost = async () => {
     try {
@@ -54,6 +45,14 @@ export default function CreatePost() {
         postCaption: postCaption,
         file: postImage,
       });
+
+      console.log("Response of new Post: ", response);
+
+      // Add POST to all Posts array
+      dispatch(addNewPost(response.newPost));
+      // Add POST to current user state
+      dispatch(setNewPostToUser(response.newPost));
+
       console.log("Post uploaded successfully");
 
       console.log(response.message);
