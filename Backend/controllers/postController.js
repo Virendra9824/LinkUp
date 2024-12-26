@@ -60,10 +60,14 @@ exports.createPost = async (req, res) => {
 
 		await user.save();
 
+		const populatedPost = await Post.findById(newPost._id)
+			.populate("owner", "firstName lastName profilePic _id") // Populate owner details
+			.populate("comments.user", "firstName lastName profilePic _id");
+
 		return res.status(200).json({
 			message: "Post created successfully",
 			success: true,
-			newPost,
+			newPost: populatedPost,
 		});
 	} catch (error) {
 		return res.status(500).json({
@@ -178,8 +182,15 @@ exports.updatePost = async (req, res) => {
 			});
 		}
 
-		const { caption } = req.body;
-		const postId = req.params.id;
+		const { caption, postId } = req.body;
+		// let postId = req.params.id;
+		// postId = new mongoose.Types.ObjectId(postId);
+
+		if (!caption || !postId) {
+			return res.status(400).json({
+				message: `Missing required fields: caption: ${caption} + postId: ${postId}`,
+			});
+		}
 
 		const post = await Post.findById(postId);
 
@@ -202,7 +213,7 @@ exports.updatePost = async (req, res) => {
 		return res.status(200).json({
 			message: "Post updated successfully",
 			success: true,
-			updatedPost: post,
+			updatedCaption: post.caption,
 		});
 	} catch (error) {
 		return res.status(500).json({
@@ -216,49 +227,57 @@ exports.updatePost = async (req, res) => {
 // Like/Unlike Post
 exports.likeUnlikePost = async (req, res) => {
 	try {
-		// console.log("Backend: ", req.body);
 		const userId = req.user.id;
 		let { postId } = req.body;
 		postId = new mongoose.Types.ObjectId(postId);
-		const user = await User.findById(userId);
 
+		// Check if the user exists
+		const user = await User.findById(userId);
 		if (!user) {
 			return res.status(404).json({
-				message: "User not found with given id",
+				message: "User not found with the given ID",
+				success: false,
 			});
 		}
 
+		// Check if the post exists
 		const post = await Post.findById(postId);
-
 		if (!post) {
 			return res.status(404).json({
-				message: "Post not found with given id",
+				message: "Post not found with the given ID",
+				success: false,
 			});
 		}
 
+		let isLiked;
 		if (post.likes.includes(userId)) {
+			// Unlike the post
 			post.likes.pull(userId);
-			await post.save();
-
-			return res.status(200).json({
-				message: "Post Unliked successfully",
-				success: true,
-				updatedPost: post,
-			});
+			isLiked = false;
 		} else {
+			// Like the post
 			post.likes.push(userId);
-			await post.save();
-
-			return res.status(200).json({
-				message: "Post Liked successfully",
-				success: true,
-				updatedPost: post,
-			});
+			isLiked = true;
 		}
+
+		// Save the updated post
+		await post.save();
+
+		// Return the essential data only
+		return res.status(200).json({
+			message: isLiked
+				? "Post liked successfully"
+				: "Post unliked successfully",
+			success: true,
+			likes: post.likes,
+			postId: post._id, // Post ID
+			likesCount: post.likes.length, // Updated like count
+			isLiked, // Current user's like status
+		});
 	} catch (error) {
 		return res.status(500).json({
-			error: error,
-			message: "Error while Like/Unlike Post: " + error.message,
+			error: error.message,
+			message: "Error while Like/Unlike Post",
 			success: false,
 		});
 	}
@@ -295,17 +314,28 @@ exports.commentOnPost = async (req, res) => {
 			});
 		}
 
-		post.comments.push({
+		// Add the new comment
+		const newComment = {
 			user: userId,
 			comment,
+		};
+		post.comments.push(newComment);
+		await post.save();
+
+		// Populate the newly added comment with user details
+		const populatedPost = await Post.findById(postId).populate({
+			path: "comments.user",
+			select: "profilePic firstName lastName",
 		});
 
-		await post.save();
+		// Extract the last comment (newly added)
+		const populatedComment =
+			populatedPost.comments[populatedPost.comments.length - 1];
 
 		return res.status(200).json({
 			message: "Comment created successfully",
 			success: true,
-			updatedPost: post,
+			newComment: populatedComment,
 		});
 	} catch (error) {
 		return res.status(500).json({
