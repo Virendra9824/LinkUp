@@ -107,6 +107,13 @@ export default function UserDetails() {
 
           <div className="mt-6 space-y-6 ">
             <Link
+              to={`/user/${loggedInUser?._id}`}
+              className="w-full text-center inline-block  bg-[#06CDF4] text-black hover:text-[#06CDF4] hover:bg-[#18292C] duration-200 py-1 px-2 rounded-md"
+            >
+              My Profile
+            </Link>
+
+            <Link
               to={"/update-profile"}
               className="w-full text-center inline-block  bg-[#06CDF4] text-black hover:text-[#06CDF4] hover:bg-[#18292C] duration-200 py-1 px-2 rounded-md"
             >
@@ -114,18 +121,12 @@ export default function UserDetails() {
             </Link>
 
             <Link
-              to={"/update-password"}
+              to={"/auth/update-password"}
               className="w-full  text-center inline-block  bg-[#06CDF4] text-black hover:text-[#06CDF4] hover:bg-[#18292C] duration-200 py-1 px-2 rounded-md"
             >
               Update Password
             </Link>
-            <Link
-              to={"/"}
-              onClick={handleOpenModal}
-              className="w-full  text-center inline-block  bg-red-500 text-black hover:text-red-500 hover:bg-[#291818] duration-200 py-1 px-2 rounded-md"
-            >
-              Delete Account
-            </Link>
+
             <DeleteAccount
               isModalOpen={isModalOpen}
               setModalOpen={setModalOpen}
