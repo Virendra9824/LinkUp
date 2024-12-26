@@ -60,7 +60,8 @@ export const logout = async () => {
     const response = await axios.get(LOGOUT_API_URL, {
       withCredentials: true,
     });
-
+    // dispatch(setToken(null));
+    // dispatch(setUser(null));
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return response.data;
@@ -69,6 +70,19 @@ export const logout = async () => {
     throw error;
   }
 };
+
+// export function logout(navigate) {
+//   return (dispatch) => {
+//     dispatch(setToken(null))
+//     dispatch(setUser(null))
+//     dispatch(resetCart())
+//     localStorage.removeItem("token")
+//     localStorage.removeItem("user")
+//     toast.success("Logged Out")
+//     navigate("/")
+//   }
+// }
+// In frontend -> dispatch(logout(navigate))
 
 export const changePassword = async (userData) => {
   try {
