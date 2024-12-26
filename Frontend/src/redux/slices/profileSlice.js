@@ -18,8 +18,19 @@ export const profileSlice = createSlice({
     setLoading(state, value) {
       state.loading = value.payload;
     },
+    setNewPostToUser(state, value) {
+      state.user.posts.unshift(value.payload);
+    },
+    updateFollowings(state, action) {
+      // console.log("USER BEFORE ***", state.user);
+      // console.log("Followings BEFORE ***", state.user.followings);
+      state.user.followings = action.payload;
+      localStorage.setItem("user", JSON.stringify(state.user));
+      // console.log("Followings AFTER ***", state.user.followings);
+    },
   },
 });
 
-export const { setUser, setLoading } = profileSlice.actions;
+export const { setUser, setLoading, setNewPostToUser, updateFollowings } =
+  profileSlice.actions;
 export default profileSlice.reducer;
