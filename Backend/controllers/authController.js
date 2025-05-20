@@ -307,8 +307,8 @@ exports.resetPassword = async (req, res) => {
 		const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
 		if (Number(otp) !== Number(recentOtp.otp)) {
-			// console.log("Received OTP:", otp);
-			// console.log("Stored OTP:", recentOtp.otp);
+			console.log("Received OTP:", otp);
+			console.log("Stored OTP:", recentOtp.otp);
 			return res.status(400).json({
 				success: false,
 				message: "Invalid OTP",

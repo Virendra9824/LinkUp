@@ -12,9 +12,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 // import {Server} from "socket.io";
 // import { socketHandler } from "./socket/socketHandler.js";
-const socketHandler = require("./socket/socketHandler.js")
-
-
+const socketHandler = require("./socket/socketHandler.js");
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -27,17 +25,16 @@ const server = http.createServer(app);
 // Set up Socket.IO on the server
 const io = new Server(server, {
 	cors: {
-	  origin: FRONTEND_URL,
-	  methods: ["GET", "POST"],
-	  credentials: true,
+		origin: FRONTEND_URL,
+		methods: ["GET", "POST"],
+		credentials: true,
 	},
-  });
-  
+});
+
 connectDB();
 
 // Apply Socket.IO handler
 
-  
 socketHandler(io);
 
 const corsOptions = {
@@ -45,12 +42,8 @@ const corsOptions = {
 	credentials: true,
 };
 
-
-
 // Use the CORS middleware
 app.use(cors(corsOptions));
-
-
 
 cloudinaryConnect();
 

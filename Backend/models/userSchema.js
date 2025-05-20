@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema(
 			trim: true,
 			unique: true,
 			minlength: 5,
-			maxlength: 20,
+			maxlength: 40,
 			match: /^[a-zA-Z0-9._]+$/,
 			lowercase: true,
 			default: function () {
